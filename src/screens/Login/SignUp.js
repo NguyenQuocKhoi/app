@@ -41,7 +41,7 @@ export function Signup(props) {
       try {
         const result = await axios.post(`${BASE_URL}/auth/register`, data);
         if (result.data.error) {
-          Alert.alert('Số điện thoại đã tồn tại');
+          Alert.alert('The phone number already exists or the password must have three or more characters');
         } else {
           Alert.alert('Registration successful');
           props.navigation.navigate('Login');

@@ -18,6 +18,7 @@ import axios from 'axios';
 import {
   Container,
   IconInfor,
+  IconPhone,
   LogoutBtn,
   RadioBtn,
   TextInput,
@@ -96,7 +97,7 @@ function Profile_1(props) {
           </TextUserInfor>
         </View>
         <View style={{flexDirection: 'row'}}>
-          <IconInfor source={require('../../images/user.png')} />
+          <IconPhone source={require('../../images/icons8-phone-50.png')} />
           <TextUserInfor>
             <Text>Phone</Text>
             <TextInput value={user.phone} editable={isUpdate} />

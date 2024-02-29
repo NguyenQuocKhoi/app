@@ -46,4 +46,12 @@ export const IconInfor = styled.Image`
 height: 30px; 
 width: 30px;
 margin-top: 30px;
+
+`;
+
+export const IconPhone = styled.Image`
+height: 30px; 
+width: 30px;
+margin-top: 30px;
+tintColor: gray
 `;

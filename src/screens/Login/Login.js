@@ -16,7 +16,7 @@ import {Alert} from 'react-native';
 import axios from 'axios';
 const Login = props => {
   const [loginType, setLoginType] = React.useState('');
-  const [phone, setPhone] = React.useState('0332787756');
+  const [phone, setPhone] = React.useState('0354597106');
   const [password, setPassword] = React.useState('123');
   const [data, setData] = React.useState([]);
   const [footerVisible, setFooterVisible] = React.useState(true);
@@ -63,7 +63,7 @@ const Login = props => {
         }
       } catch (error) {
         // props.navigation.navigate('Home')
-        Alert.alert('Số điện thoại hoặc mật khẩu không đúng')
+        Alert.alert('Incorrect phone number or password')
         // console.log(error);
       }
     } else {

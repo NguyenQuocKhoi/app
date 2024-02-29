@@ -44,9 +44,9 @@ function Home(props) {
   const dispatch = useDispatch();
   const onPressItem = (option) => {
     setModalVisible(false);
-    if (option === 'Tạo nhóm') {
+    if (option === 'Create group') {
       props.navigation.navigate('GroupScreen');
-    } else if (option === 'Thêm bạn') {
+    } else if (option === 'Add friend') {
       props.navigation.navigate('Friend_timkiem');
     }
   };
@@ -143,7 +143,7 @@ function Home(props) {
             marginRight: 10,
           }}
           placeholderTextColor="white"
-          placeholder="   Tìm kiếm"
+          placeholder="   Search"
           onPressIn={() =>
             props.navigation.navigate('Friend_timkiem')
           }></TextInput>
@@ -161,22 +161,22 @@ function Home(props) {
           }}
         >
           <View style={{flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.005)', alignItems: 'flex-end', justifyContent: 'flex-start'}}>
-            <View style={{ backgroundColor: 'white', alignItems: 'flex-end', width: 110, marginTop: 10, marginRight: 10, borderRadius: 5}}>
+            <View style={{ backgroundColor: 'white', alignItems: 'flex-end', width: 130, marginTop: 10, marginRight: 10, borderRadius: 5}}>
             <TouchableOpacity
-                onPress={() => onPressItem('Thêm bạn')}
+                onPress={() => onPressItem('Add friend')}
                 style={{flexDirection: 'row', margin: 10}}
               >
                 <AddFriendImg1
                   source={require('../../images/icons8-add-friend-24.png')}></AddFriendImg1>
-                <Text>Thêm bạn</Text>
+                <Text>Add friend</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => onPressItem('Tạo nhóm')}
+                onPress={() => onPressItem('Create group')}
                 style={{flexDirection: 'row', margin: 10}}
               >
                 <AddFriendImg1
                   source={require('../../images/icons8-group-24.png')}></AddFriendImg1>
-                <Text>Tạo nhóm</Text>
+                <Text>Create group</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={()=>setModalVisible(false)}
@@ -184,7 +184,7 @@ function Home(props) {
               >
                 <CrossImg
                   source={require('../../images/icons8-cross-30.png')}></CrossImg>
-                <Text style={{marginRight: 35}}>Hủy</Text>
+                <Text style={{marginRight: 35}}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>

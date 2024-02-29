@@ -4,7 +4,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Home from './Home';
 import Profile from '../Profile/Profile';
 import React from 'react';
-
+import ChatInfo1 from '../Conservation/ChatInfo';
 import Friend_banbe from '../Friends/FriendScreen';
 // import Friend1 from '../Friends/ListFriends';
 const BottomTab = createBottomTabNavigator();
