@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {BASE_URL, getUserId, getToken} from '../../utils';
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { BASE_URL, getUserId, getToken } from '../../utils';
 import axios from 'axios';
 import {
   getMessageSocket,
@@ -11,12 +11,12 @@ import {
   getCurrentMessage,
   handleSetCurrentMessage,
 } from '../../redux/messageSlice';
-import {View, Text, TextInput, TouchableOpacity, PermissionsAndroid} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, PermissionsAndroid, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SendingContent from './SendingContent';
 import ReceivingContent from './ReceivingContent';
-import {ScrollView} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import {
   BackImg,
   FaceImg,
@@ -32,8 +32,10 @@ import {
   TextOnline,
   VideoCallImg,
 } from './styles';
-import { launchCamera } from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary, ImagePicker } from 'react-native-image-picker';
 import { Image } from 'react-native';
+// import * as ImagePicker from 'expo-image-picker';
+
 export default function Chat() {
   const [inputMessage, setInputMessage] = useState('');
   const scrollRef = useRef(null);
@@ -42,10 +44,6 @@ export default function Chat() {
   const navigation = useNavigation();
   const [notiAddMember, setNotiAddMember] = useState('');
   const usersOnline = useSelector(state => state.userReducer.usersOnline);
- 
-  //chọn ảnh
-  const [img, setImg] = useState('');
-
   const selectedConversation = useSelector(
     state => state.conversationReducer.selectedConversation,
   );
@@ -56,6 +54,111 @@ export default function Chat() {
     state => state.messageReducer.currentMessage,
   );
   const isOnline = Object.keys(usersOnline).find(id => id === recipient?._id);
+
+  //4/3 ver2
+  const uploadImage = async () => {
+    const selectedFiles = inputImageReference.current.files;
+    const userId = await getUserId();
+    const token = await getToken();
+
+
+    const list = [];
+    for (let i = 0; i < selectedFiles.length; i++) {
+      list.push(selectedFiles[i].uri);
+    }
+
+    const formData = new FormData();
+    for (let i = 0; i < selectedFiles.length; i++) {
+      formData.append("files", {
+        uri: selectedFiles[i].uri,
+        name: selectedFiles[i].name,
+        type: selectedFiles[i].type,
+      });
+    }
+
+    formData.append("conversationId", selectedConversation._id);
+    formData.append("user", userId);
+
+    try {
+      const result = await axios.post(`/conversation/sendImages`, formData,
+        {
+          headers: {
+            'auth-token': `${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      if (result.status === 200) {
+        sendMessageSocket({
+          ...result.data,
+          receiverIds: selectedConversation.users
+            .filter((user) => user._id !== userId)
+            .map((user) => user._id),
+        });
+        await dispatch(getCurrentMessage(selectedConversation._id));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //chon anh new 3/2
+  const [img, setImg] = useState('');
+
+  const sendMessageGuiAnh = async () => {
+    const checkPermission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
+
+    if (checkPermission === PermissionsAndroid.RESULTS.GRANTED) {
+      // console.log("ok")
+      // mở camera
+      const result = await launchCamera({ mediaType: 'photo', cameraType: 'back' });
+      //mở thư viện ảnh
+      // const result = await launchImageLibrary({mediaType:'photo'});
+      console.log(result.assets[0].uri);
+      setImg(result.assets[0].uri);
+
+      try {
+        const token = await getToken();
+        const userId = await getUserId();
+
+        // Tạo FormData và thêm ảnh vào đó
+        const formData = new FormData();
+        formData.append('files', img
+        // {
+        //   uri: img.uri,
+        //   type: 'image/jpeg', // Thay đổi kiểu MIME tùy theo loại ảnh bạn gửi
+        //   name: 'image.jpg',
+        // }
+        );
+        formData.append("conversationId", selectedConversation._id);
+        formData.append("user", userId);
+
+        // Gửi yêu cầu POST đến API
+        const result = await axios.post(
+          `${BASE_URL}/conversation/sendImages`,
+          formData,
+          {
+            headers: {
+              'auth-token': `${token}`,
+              // 'Content-Type': 'multipart/form-data', // Thiết lập loại dữ liệu là multipart/form-data
+            },
+          }
+        );
+
+        if (result.status === 200) {
+          sendMessageSocket({
+            ...result.data,
+            receiverIds: selectedConversation.users
+              .filter((user) => user._id !== userId)
+              .map((user) => user._id),
+          });
+          await dispatch(getCurrentMessage(selectedConversation._id));
+        }
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
+    }
+  };
 
   const handleNotiAddMember = noti => {
     setNotiAddMember(noti);
@@ -100,7 +203,7 @@ export default function Chat() {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollToEnd({animated: true});
+      scrollRef.current.scrollToEnd({ animated: true });
     }
   }, [currentMessage, selectedConversation]);
 
@@ -121,42 +224,32 @@ export default function Chat() {
     }
   };
 
-  // useEffect(() => {
-  //   getMessageSocket()
-  //     .then(result => {
-  //       // console.log(result);
-  //       dispatch(handleSetCurrentMessage(result));
-  //     })
-  //     .catch(error => {
-  //       console.log(error);
-  //     });
-  // }, [userId]);
-
-  // console.log(currentMessage);
-
   //chọn ảnh
-  const requestCameraPermission = async ()=>{
-    try{
+  const requestCameraPermission = async () => {
+    try {
       const checkPermission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
-      
-      if(checkPermission === PermissionsAndroid.RESULTS.GRANTED){
+
+      if (checkPermission === PermissionsAndroid.RESULTS.GRANTED) {
         // console.log("ok")
         // mở camera
-        const result = await launchCamera({mediaType:'photo', cameraType:'back'});
+        const result = await launchCamera({ mediaType: 'photo', cameraType: 'back' });
         //mở thư viện ảnh
         // const result = await launchImageLibrary({mediaType:'photo'});
         console.log(result.assets[0].uri);
         setImg(result.assets[0].uri);
-      }else{
+
+      } else {
         console.log("Từ chối")
       }
-    }catch(error){
+    } catch (error) {
       console.log(error);
     }
   }
 
+
+
   return (
-    <View style={{flex: 1, backgroundColor: '#F2FFFF'}}>
+    <View style={{ flex: 1, backgroundColor: '#F2FFFF' }}>
       <Header>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <BackImg
@@ -182,13 +275,13 @@ export default function Chat() {
           <VideoCallImg
             source={require('../../images/icons8-video-call-48.png')}></VideoCallImg>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {navigation.navigate('ChatInfo1'); handleNotiAddMember}}>
+        <TouchableOpacity onPress={() => { navigation.navigate('ChatInfo1'); handleNotiAddMember }}>
           <ListImg
             source={require('../../images/icons8-list-24.png')}></ListImg>
         </TouchableOpacity>
         {/* <Text>{userId}</Text> */}
       </Header>
-      <View style={{marginTop: 20, marginLeft: 10, marginRight: 10, flex: 3}}>
+      <View style={{ marginTop: 20, marginLeft: 10, marginRight: 10, flex: 3 }}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
@@ -198,6 +291,7 @@ export default function Chat() {
               return (
                 <ScrollView key={index}>
                   <SendingContent data={item} />
+                  {/* <Image source={item.images} style={{height: 100, width: 100, alignSelf: 'flex-end', margin: 5,backgroundColor: 'green'}}/> */}
                 </ScrollView>
               );
             } else {
@@ -251,12 +345,15 @@ export default function Chat() {
           </TouchableOpacity>
           <TouchableOpacity
             //chọn ảnh
-            onPress={()=>requestCameraPermission()}
+            // onPress={() => requestCameraPermission()}
+          onPress={() => sendMessageGuiAnh()}
           >
             <ImageImg
               source={require('../../images/icons8-image-48.png')}></ImageImg>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleSendMessage()}>
+          {/* thu gui anh */}
+          {/* <TouchableOpacity onPress={() => sendMessageGuiAnh()}> */}
             {/* <Text>gui</Text> */}
             <SendImg
               source={require('../../images/icons8-send-32.png')}></SendImg>
@@ -265,8 +362,10 @@ export default function Chat() {
 
         {/* chọn ảnh */}
         <View>
-          {img!=''?<Image source={{uri:img}} style={{height: 250, width: 200}}/>:''}
-          
+          {/* <TouchableOpacity onPress={handleChoosePhoto}> */}
+          <TouchableOpacity>
+            {img && <Image source={{ uri: img }} style={{ width: 200, height: 100 }} />}
+          </TouchableOpacity>
         </View>
       </View>
     </View>

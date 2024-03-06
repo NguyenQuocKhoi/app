@@ -52,12 +52,33 @@ export default function CardChat({data}) {
     const result = await axios.get(
       `${BASE_URL}/conversation/getMessages/${data._id}`,
     );
+    // if (result.status === 200) {
+    //   const last = result.data[result.data?.length - 1];
+    //   if (last.user._id === userId) {
+    //     setLastMessage(`Bạn: ${last?.text}`);
+    //   } else {
+    //     setLastMessage(last.text);
+    //   }
+    //   setLastTime(last?.createdAt);
+    // }
+
+    //thử gửi ảnh
     if (result.status === 200) {
       const last = result.data[result.data?.length - 1];
       if (last.user._id === userId) {
-        setLastMessage(`Bạn: ${last?.text}`);
+        if(last?.text){
+          setLastMessage(`Bạn: ${last?.text}`);
+        } else if(last?.images.length > 0){
+          // setLastMessage(`[Hình ảnh]`)
+          setLastMessage(`Bạn: vừa gửi ${last.images.length} ảnh`)
+        }
       } else {
-        setLastMessage(last.text);
+        if(last?.text){
+          setLastMessage(last?.text);
+        }else if(last?.images.length > 0){
+          // setLastMessage(`[Hình ảnh]`)
+          setLastMessage(`vừa gửi ${last.images.length} ảnh`)
+        }
       }
       setLastTime(last?.createdAt);
     }

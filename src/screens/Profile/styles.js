@@ -49,6 +49,16 @@ margin-top: 30px;
 
 `;
 
+export const IconCamera = styled.Image`
+height: 30px; 
+width: 30px;
+margin-top: 80px;
+margin-left: -30px;
+
+position: absolute;
+`;
+
+
 export const IconPhone = styled.Image`
 height: 30px; 
 width: 30px;
