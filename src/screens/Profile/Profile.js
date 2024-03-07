@@ -84,13 +84,13 @@ function Profile_1(props) {
       const formData = new FormData();
       formData.append("file", {
         uri: img,
-        type: 'image/jpeg', // Adjust the type according to your needs
-        name: 'avatar.jpg' // Adjust the name according to your needs
+        type: 'image/jpeg', 
+        name: 'avatar.jpg' 
       });
       const result = await axios.post(`${BASE_URL}/users/uploadAvatar/${userId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          "auth-token": token // No need to interpolate token here
+          "auth-token": token 
 
         }
       });
