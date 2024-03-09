@@ -1,9 +1,13 @@
 import moment from 'moment';
-import {Image, View} from 'react-native';
+import {Image, Linking, TouchableOpacity, View} from 'react-native';
 import {Text} from 'react-native-animatable';
 
 export default function ReceivingContent({data, sender}) {
   const senderName = sender.name;
+  const handlePress = () => {
+    const url = data.file;
+    Linking.openURL(url);
+  };
   return (
     <View style={{flexDirection: 'row'}}>
       <View
@@ -43,6 +47,17 @@ export default function ReceivingContent({data, sender}) {
             />
           </View>
         ))}
+        {data.file
+        ? (
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity
+              onPress={() => handlePress()}
+            >
+              <Text style={{color: '#3399ff', textDecorationLine: 'underline', padding: 10}}>{data.file}</Text>
+            </TouchableOpacity>
+          </View>
+        )
+        : null}
         <Text style={{margin: 5, color: 'gray'}}>
           {moment(data.createdAt).format('HH:mm')}
         </Text>

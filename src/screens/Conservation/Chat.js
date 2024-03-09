@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {BASE_URL, getUserId, getToken} from '../../utils';
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { BASE_URL, getUserId, getToken } from '../../utils';
 import axios from 'axios';
 import {
   getMessageSocket,
@@ -22,8 +22,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SendingContent from './SendingContent';
 import ReceivingContent from './ReceivingContent';
-import {ScrollView} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import {
   BackImg,
   FaceImg,
@@ -42,9 +42,10 @@ import {
 import {
   launchCamera,
   launchImageLibrary,
-  ImagePicker,
+  ImagePicker
 } from 'react-native-image-picker';
-import {Image} from 'react-native';
+import { Image } from 'react-native';
+import DocumentPicker from 'react-native-document-picker';
 export default function Chat() {
   const [inputMessage, setInputMessage] = useState('');
   const scrollRef = useRef(null);
@@ -131,6 +132,60 @@ export default function Chat() {
     }
   };
 
+const uploadFile = async () => {
+  try {
+    const userId = await getUserId();
+    const token = await getToken();
+    const docs = await DocumentPicker.pick({
+      type: [DocumentPicker.types.pdf],
+      allowMultiSelection: true
+    });
+
+    const formData = new FormData();
+    for (let i = 0; i < docs.length; i++) {
+      const file = {
+        uri: docs[i].uri,
+        type: docs[i].type,
+        name: docs[i].name,
+      };
+      formData.append("file", file);
+    }
+    formData.append("conversationId", selectedConversation._id);
+    formData.append("user", userId);
+
+    try {
+      const result = await axios.post(
+        `${BASE_URL}/conversation/sendFile`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'auth-token': token,
+          },
+        },
+      );
+      if (result.status === 200) {
+        sendMessageSocket({
+          ...result.data,
+          receiverIds: selectedConversation.users
+            .filter(user => user._id !== userId)
+            .map(user => user._id),
+        });
+        await dispatch(getCurrentMessage(selectedConversation._id));
+      }
+    } catch (error) {
+      console.log(1);
+      console.log(error);
+    }
+  } catch (error) {
+    if (DocumentPicker.isCancel(error))
+      console.log("User cancelled the upload", error);
+    else
+      console.log(error);
+  }
+};
+
+
   const handleSendMessage = async () => {
     const userId = await getUserId();
     const token = await getToken();
@@ -172,7 +227,7 @@ export default function Chat() {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current?.scrollToEnd({animated: true});
+      scrollRef.current?.scrollToEnd({ animated: true });
     }
   }, [currentMessage, selectedConversation]);
 
@@ -194,7 +249,7 @@ export default function Chat() {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: '#F2FFFF'}}>
+    <View style={{ flex: 1, backgroundColor: '#F2FFFF' }}>
       <Header>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <BackImg
@@ -229,7 +284,7 @@ export default function Chat() {
             source={require('../../images/icons8-list-24.png')}></ListImg>
         </TouchableOpacity>
       </Header>
-      <View style={{marginTop: 20, marginLeft: 10, marginRight: 10, flex: 3}}>
+      <View style={{ marginTop: 20, marginLeft: 10, marginRight: 10, flex: 3 }}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
@@ -278,7 +333,9 @@ export default function Chat() {
             placeholder="Tin nhắn"
             onChangeText={setInputMessage}
             value={inputMessage}></TextInput>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => uploadFile()}
+          >
             <MoreImg
               source={require('../../images/icons8-more-48.png')}></MoreImg>
           </TouchableOpacity>
