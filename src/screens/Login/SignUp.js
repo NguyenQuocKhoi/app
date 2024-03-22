@@ -1,12 +1,23 @@
 import React from 'react';
-import {View, SafeAreaView, Keyboard} from 'react-native';
-import {Button, Input, Text, Text as TextComp} from '../../components';
+import {
+  View,
+  SafeAreaView,
+  Keyboard,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
+// import {Button, Input, Text, Text as TextComp} from '../../components';
 import {
   FooterTextBtn,
   FooterText,
   LoginImg,
   ContentContainer,
   TextB,
+  TextSignUp,
+  BtnSignUp,
+  TextS,
+  TextInput,
+  TextBtnSignUp,
 } from './styles';
 import * as Animatable from 'react-native-animatable';
 import {BASE_URL, checkPhoneValid} from '../../utils';
@@ -21,6 +32,7 @@ export function Signup(props) {
   const [name, setName] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [footerVisible, setFooterVisible] = React.useState(true);
+  const [eyeClick, setEyeClick] = React.useState(true);
 
   React.useEffect(() => {
     Keyboard.addListener('keyboardDidShow', () => setFooterVisible(false));
@@ -41,7 +53,9 @@ export function Signup(props) {
       try {
         const result = await axios.post(`${BASE_URL}/auth/register`, data);
         if (result.data.error) {
-          Alert.alert('The phone number already exists or the password must have three or more characters');
+          Alert.alert(
+            'The phone number already exists or the password must have three or more characters',
+          );
         } else {
           Alert.alert('Registration successful');
           props.navigation.navigate('Login');
@@ -57,56 +71,89 @@ export function Signup(props) {
 
   return (
     <>
-      {!loginType ? (
-        <ContentContainer>
-          <LoginImg />
-          <TextComp size="big" weight="900">
-            Chatter Sign Up
-          </TextComp>
-          <Button
-            title="Sign up with phone"
-            style={{marginTop: 35}}
-            onPress={() => setLoginType(1)}
-          />
-        </ContentContainer>
-      ) : (
-        <Animatable.View animation="fadeIn" style={{flex: 1}}>
-          <View style={{padding: 20}}>
-            <TextComp size="larger" weight="900">
-              Sign up with phone
-            </TextComp>
-            <Input label="Name" value={name} onChange={setName} />
-            <Input
-              label="Phone"
-              value={phone}
-              onChange={setPhone}
-              keyboardType="phone-pad"
-            />
-            <Input
-              label="Password"
-              value={password}
-              onChange={setPassword}
-              secureTextEntry
-            />
-            <Button
-              title="Sign Up"
-              style={{marginTop: 25}}
-              onPress={() => {
-                handleSignUp();
-              }}
-            />
-          </View>
-        </Animatable.View>
-      )}
-      {footerVisible ? (
-        <FooterTextBtn onPress={() => props.navigation.navigate('Login')}>
-          <SafeAreaView>
-            <FooterText>
-              <TextB>Have an account?</TextB> Login
-            </FooterText>
-          </SafeAreaView>
-        </FooterTextBtn>
-      ) : null}
+      <View style={{backgroundColor: '#ffff', flex: 1}}>
+        {!loginType ? (
+          <ContentContainer>
+            <LoginImg />
+            <TextSignUp>Appchat Sign Up</TextSignUp>
+            <BtnSignUp>
+              <TouchableOpacity onPress={() => setLoginType(1)}>
+                <TextBtnSignUp>Sign up with phone</TextBtnSignUp>
+              </TouchableOpacity>
+            </BtnSignUp>
+          </ContentContainer>
+        ) : (
+          <Animatable.View animation="fadeIn" style={{flex: 1}}>
+            <View style={{padding: 20}}>
+              <TextS>Sign up with phone</TextS>
+              <View
+                style={{
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  borderBottomWidth: 1,
+                  borderBottomColor: 'gray',
+                }}>
+                <TextInput
+                  placeholder="Name"
+                  value={name}
+                  onChangeText={setName}></TextInput>
+              </View>
+              <View
+                style={{
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  borderBottomWidth: 1,
+                  borderBottomColor: 'gray',
+                }}>
+                <TextInput
+                  placeholder="Phone"
+                  value={phone}
+                  onChangeText={setPhone}
+                  keyboardType="phone-pad"></TextInput>
+              </View>
+              <View
+                style={{
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  borderBottomWidth: 1,
+                  borderBottomColor: 'gray',
+                }}>
+                <TextInput
+                  placeholder="Password"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={eyeClick}></TextInput>
+                <TouchableOpacity
+                  onPress={() => {
+                    setEyeClick(!eyeClick);
+                  }}>
+                  <Text style={{color: '#3399FF'}}>View</Text>
+                </TouchableOpacity>
+              </View>
+              <BtnSignUp>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleSignUp();
+                  }}>
+                  <TextBtnSignUp>Sign up</TextBtnSignUp>
+                </TouchableOpacity>
+              </BtnSignUp>
+            </View>
+          </Animatable.View>
+        )}
+        {footerVisible ? (
+          <FooterTextBtn onPress={() => props.navigation.navigate('Login')}>
+            <SafeAreaView>
+              <FooterText>
+                <TextB>Have an account?</TextB> Login
+              </FooterText>
+            </SafeAreaView>
+          </FooterTextBtn>
+        ) : null}
+      </View>
     </>
   );
 }

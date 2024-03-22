@@ -132,59 +132,116 @@ export default function Chat() {
     }
   };
 
-const uploadFile = async () => {
-  try {
-    const userId = await getUserId();
-    const token = await getToken();
-    const docs = await DocumentPicker.pick({
-      type: [DocumentPicker.types.pdf],
-      allowMultiSelection: true
-    });
-
-    const formData = new FormData();
-    for (let i = 0; i < docs.length; i++) {
-      const file = {
-        uri: docs[i].uri,
-        type: docs[i].type,
-        name: docs[i].name,
-      };
-      formData.append("file", file);
-    }
-    formData.append("conversationId", selectedConversation._id);
-    formData.append("user", userId);
-
+  const uploadVideo = async () => {
     try {
-      const result = await axios.post(
-        `${BASE_URL}/conversation/sendFile`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'auth-token': token,
+      const userId = await getUserId();
+      const token = await getToken();
+      const docs = await DocumentPicker.pick({
+        type: [DocumentPicker.types.pdf],
+        allowMultiSelection: true
+      });
+
+      const formData = new FormData();
+      for (let i = 0; i < docs.length; i++) {
+        const file = {
+          uri: docs[i].uri,
+          type: docs[i].type,
+          name: docs[i].name,
+        };
+        formData.append("file", file);
+      }
+      formData.append("conversationId", selectedConversation._id);
+      formData.append("user", userId);
+
+      try {
+        const result = await axios.post(
+          `${BASE_URL}/conversation/sendFile`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'auth-token': token,
+            },
           },
-        },
-      );
-      if (result.status === 200) {
-        sendMessageSocket({
-          ...result.data,
-          receiverIds: selectedConversation.users
-            .filter(user => user._id !== userId)
-            .map(user => user._id),
-        });
-        await dispatch(getCurrentMessage(selectedConversation._id));
+        );
+        if (result.status === 200) {
+          sendMessageSocket({
+            ...result.data,
+            receiverIds: selectedConversation.users
+              .filter(user => user._id !== userId)
+              .map(user => user._id),
+          });
+          await dispatch(getCurrentMessage(selectedConversation._id));
+        }
+      } catch (error) {
+        console.log(1);
+        console.log(error);
       }
     } catch (error) {
-      console.log(1);
-      console.log(error);
+      if (DocumentPicker.isCancel(error))
+        console.log("User cancelled the upload", error);
+      else
+        console.log(error);
     }
-  } catch (error) {
-    if (DocumentPicker.isCancel(error))
-      console.log("User cancelled the upload", error);
-    else
-      console.log(error);
   }
-};
 
+  const handleSendLocation = () => {
+
+  }
+
+  const uploadFile = async () => {
+    try {
+      const userId = await getUserId();
+      const token = await getToken();
+      const docs = await DocumentPicker.pick({
+        // type: [DocumentPicker.types.pdf||DocumentPicker.types.docx||DocumentPicker.types.pptx],
+        type: [DocumentPicker.types.allFiles],
+        allowMultiSelection: true
+      });
+
+      const formData = new FormData();
+      for (let i = 0; i < docs.length; i++) {
+        const file = {
+          uri: docs[i].uri,
+          type: docs[i].type,
+          name: docs[i].name,
+        };
+        formData.append("file", file);
+      }
+      formData.append("conversationId", selectedConversation._id);
+      formData.append("user", userId);
+
+      try {
+        const result = await axios.post(
+          `${BASE_URL}/conversation/sendFile`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'auth-token': token,
+            },
+          },
+        );
+        if (result.status === 200) {
+          sendMessageSocket({
+            ...result.data,
+            receiverIds: selectedConversation.users
+              .filter(user => user._id !== userId)
+              .map(user => user._id),
+          });
+          await dispatch(getCurrentMessage(selectedConversation._id));
+        }
+      } catch (error) {
+        console.log(1);
+        console.log(error);
+      }
+    } catch (error) {
+      if (DocumentPicker.isCancel(error))
+        console.log("User cancelled the upload", error);
+      else
+        console.log(error);
+    }
+  };
 
   const handleSendMessage = async () => {
     const userId = await getUserId();
@@ -278,7 +335,7 @@ const uploadFile = async () => {
         <TouchableOpacity
           onPress={() => {
             navigation.navigate('ChatInfo1');
-            handleNotiAddMember;
+            // handleNotiAddMember;
           }}>
           <ListImg
             source={require('../../images/icons8-list-24.png')}></ListImg>
@@ -317,9 +374,17 @@ const uploadFile = async () => {
             alignItems: 'center',
             backgroundColor: 'white',
           }}>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => uploadVideo()}
+          >
             <FaceImg
-              source={require('../../images/icons8-face-id-48.png')}></FaceImg>
+              source={require('../../images/icons8-video-50.png')}></FaceImg>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => { }}
+          >
+            <FaceImg
+              source={require('../../images/icons8-location-50.png')}></FaceImg>
           </TouchableOpacity>
           <TextInput
             style={{
