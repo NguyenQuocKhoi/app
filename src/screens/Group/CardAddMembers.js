@@ -59,7 +59,7 @@ export default function CardAddMembers(props) {
         },
       );
       if (result.status === 200) {
-        Alert.alert('thanh cong');
+        Alert.alert('success');
         try {
           const result = await axios.get(
             `${BASE_URL}/conversation/${props.conversationId}`,

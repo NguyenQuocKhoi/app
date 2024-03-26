@@ -1,10 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {
   View,
-  FlatList,
   TouchableOpacity,
-  RefreshControl,
-  AppState,
   Text,
   Image,
   PermissionsAndroid,
@@ -13,10 +10,10 @@ import {
 import {RadioButton} from 'react-native-paper';
 import {BASE_URL, getToken, getUserId} from '../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useSelector} from 'react-redux';
 import axios from 'axios';
 import {
   BtnUpdate,
+  ChangePasswordBtn,
   Container,
   IconCamera,
   IconInfor,
@@ -35,7 +32,6 @@ function Profile_1(props) {
   const [user, setUser] = useState({});
   const [inputName, setInputName] = useState('');
   const [isUpdate, setIsUpdate] = useState(false);
-  const [checked, setChecked] = useState('');
   const [img, setImg] = useState('');
   const [urlImage, setUrlImage] = useState();
   const [inputGender, setInputGender] = useState();
@@ -84,7 +80,7 @@ function Profile_1(props) {
       name: inputName,
       gender: inputGender,
     };
-    console.log(data);
+    // console.log(data);
     try {
       const result = await axios.put(`${BASE_URL}/users/${userId}`, data, {
         headers: {
@@ -184,6 +180,7 @@ function Profile_1(props) {
               value={inputName}
               onChangeText={setInputName}
               editable={isUpdate}
+              
             />
           </TextUserInfor>
         </View>
@@ -252,6 +249,7 @@ function Profile_1(props) {
 
       <View>
         <LogoutBtn onPress={() => handleLogOut()}>Logout</LogoutBtn>
+        <ChangePasswordBtn onPress={()=>{props.navigation.navigate('ChangePasswordScreen')}}>Change password</ChangePasswordBtn>
       </View>
     </Container>
   );

@@ -13,24 +13,24 @@ export const Header = styled.View`
   justify-content: space-between;
   background-color: #3399ff;
   align-items: center;
-  height: 50;
+  height: 50px;
 `;
 
 
 export const AddFriendImg = styled.Image`
-  margin-right: 10;
+  margin-right: 10px;
   width: 25px;
   height: 30px;
 `;
 
 export const SearchImg = styled.Image`
-  margin-left: 10;
+  margin-left: 10px;
   width: 25px;
   height: 25px;
 `;
 
 export const SearchImg1 = styled.Image`
-  margin-left: 10;
+  margin-left: 10px;
   width: 25px;
   height: 25px;
   tintColor: black;
@@ -42,40 +42,40 @@ export const GroupImg = styled.Image`
 `;
 
 export const PhoneImg = styled.Image`
-  margin-left: 10;
+  margin-left: 10px;
   width: 25px;
   height: 25px;
   tintColor: black;
 `;
 
 export const VideoCallImg = styled.Image`
-  margin-left: 20;
-  margin-right: 10;
+  margin-left: 20px;
+  margin-right: 10px;
   width: 25px;
   height: 25px;
   tintColor: black;
 `;
 
 export const BackImg = styled.Image`
-  margin-left: 10;
+  margin-left: 10px;
   width: 25px;
   height: 30px;
 `;
 
 export const QrImg = styled.Image`
-  margin-right: 10;
+  margin-right: 10px;
   width: 25px;
   height: 25px;
 `;
 
 export const SettingImg = styled.Image`
-  margin-right: 10;
+  margin-right: 10px;
   width: 25px;
   height: 25px;
 `;
 
 export const BaCham = styled.Image`
-  margin-right: 10;
+  margin-right: 10px;
   width: 25px;
   height: 30px;
   tintColor: black;

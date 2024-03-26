@@ -62,12 +62,12 @@ function CardUser({data}) {
       .then((result) => {
         if (result.status === 200) {
           Alert.alert('Success');
-          setTextButton('Cancel');
+          // setTextButton('Cancel');
         }
       })
       .catch((error) => {
-        console.log(error.response.data);
-        Alert.alert('Request Fail');
+        // console.log(error.response.data);
+        Alert.alert(error.response.data);
         
       });
   };

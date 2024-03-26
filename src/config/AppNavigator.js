@@ -7,10 +7,10 @@ import Signup from '../screens/Login/SignUp';
 import Login from '../screens/Login/Login';
 import Profile from '../screens/Profile/Profile';
 import Chat from '../screens/Conservation/Chat';
-import Friend_timkiem from '../screens/Friends/CardFriendSearch';
+import Friend_timkiem from '../screens/Friends/FriendSearchScreen';
 import Friend_received from '../screens/Friends/FriendReceivedScreen';
 import GroupScreen from '../screens/Group/GroupScreen';
-// import AddMembersScreen from '../screens/Group/CardAddMembers';
+import { ChangePasswordScreen } from '../screens/Profile/ChangePassScreen';
 import CardAddMembers from '../screens/Group/CardAddMembers';
 import ChatInfo1 from '../screens/Conservation/ChatInfo';
 import AddMember from '../screens/Group/ScreenAddMember';
@@ -89,6 +89,11 @@ const appNavigator = () => {
         <Stack.Screen
           name="CardAddMembers"
           component={CardAddMembers}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="ChangePasswordScreen"
+          component={ChangePasswordScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

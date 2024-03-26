@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   FlatList,
@@ -25,7 +25,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import axios from 'axios';
 import CardUser from './CardUserSearch';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import ReceivedInvitation from './ReceivedInvitation';
 import { getPenddingRequests } from '../../redux/userSlice';
 function Friend_received(props) {
@@ -38,7 +38,8 @@ function Friend_received(props) {
   const pendingRequests = useSelector(
     state => state.userReducer.pendingRequests,
   );
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     const getPendding = async () => {
       try {
         const userID = await getUserId();
@@ -50,7 +51,7 @@ function Friend_received(props) {
       }
     };
     getPendding();
-  }, []);
+  }, []));
 
   return (
     <View>

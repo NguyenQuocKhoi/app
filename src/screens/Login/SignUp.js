@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   SafeAreaView,
@@ -21,20 +21,17 @@ import {
 } from './styles';
 import * as Animatable from 'react-native-animatable';
 import {BASE_URL, checkPhoneValid} from '../../utils';
-import {postApiNoneToken} from '../../config/Axios';
 import {Alert} from 'react-native';
-import {useDispatch} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 export function Signup(props) {
-  const [loginType, setLoginType] = React.useState('');
-  const [phone, setPhone] = React.useState('');
-  const [name, setName] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [footerVisible, setFooterVisible] = React.useState(true);
-  const [eyeClick, setEyeClick] = React.useState(true);
+  const [loginType, setLoginType] = useState('');
+  const [phone, setPhone] = useState('');
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  const [footerVisible, setFooterVisible] = useState(true);
+  const [eyeClick, setEyeClick] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     Keyboard.addListener('keyboardDidShow', () => setFooterVisible(false));
     Keyboard.addListener('keyboardDidHide', () => setFooterVisible(true));
     return () => {
@@ -53,9 +50,7 @@ export function Signup(props) {
       try {
         const result = await axios.post(`${BASE_URL}/auth/register`, data);
         if (result.data.error) {
-          Alert.alert(
-            'The phone number already exists or the password must have three or more characters',
-          );
+          Alert.alert(result.data.error);
         } else {
           Alert.alert('Registration successful');
           props.navigation.navigate('Login');

@@ -8,11 +8,18 @@ export const Container = styled.View`
 `;
 
 export const LogoutBtn = styled.Text`
-  margin-top: 30px;
+  margin-top: 20px;
   text-align: center;
   color: red;
-  font-size: 15px;
+  font-size: 16px;
 `;
+
+export const ChangePasswordBtn = styled.Text`
+  margin-top: 20px;
+  text-align: center;
+  color: blue;
+  font-size: 16px;
+`
 
 export const TextInput = styled.TextInput`
   font-size: 20px;
@@ -87,7 +94,5 @@ export const BtnUpdate = styled.View`
     height: 2px;
   }
   shadowopacity: 0.17;
-  shadowradius: 2.54;
-
   margin-top:20px;
 `;

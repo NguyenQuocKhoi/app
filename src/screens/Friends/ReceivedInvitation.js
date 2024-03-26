@@ -1,11 +1,11 @@
 import axios from 'axios';
-import React, {useState, useEffect, useId} from 'react';
+import React, {useState, useEffect, useId, useCallback} from 'react';
 import {Alert, Image, TouchableOpacity} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {getPenddingRequests} from '../../redux/userSlice';
 import {Text, View} from 'react-native-animatable';
 import {refreshUser, resetUser} from '../../redux/apiRequest';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {BASE_URL} from '../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function ReceivedInvitation({data}) {
@@ -106,7 +106,8 @@ export default function ReceivedInvitation({data}) {
     }
   };
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     const fetchData = async () => {
       try {
         const token = await getToken();
@@ -123,7 +124,7 @@ export default function ReceivedInvitation({data}) {
       }
     };
     fetchData();
-  }, []);
+  }, []),);
 
   return (
     <View style={{height: 80, height: 80, alignItems: 'center', borderColor: 'gray', borderWidth: 1, flexDirection: 'row'}}>
@@ -138,13 +139,13 @@ export default function ReceivedInvitation({data}) {
               onPress={() => {
                 handleAcceptFriend();
               }}>
-              <Text style={{fontSize: 20}}>Đồng ý</Text>
+              <Text style={{fontSize: 20}}>Agree</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
                 handleRejectFriend();
               }}>
-              <Text style={{fontSize: 20}}>Từ chối</Text>
+              <Text style={{fontSize: 20}}>Reject</Text>
             </TouchableOpacity>
           </View>
       </View>

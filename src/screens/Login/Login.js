@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   SafeAreaView,
@@ -26,14 +26,14 @@ import {BASE_URL, checkPhoneValid} from '../../utils';
 import {Alert} from 'react-native';
 import axios from 'axios';
 const Login = props => {
-  const [loginType, setLoginType] = React.useState('');
-  const [phone, setPhone] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [data, setData] = React.useState([]);
-  const [footerVisible, setFooterVisible] = React.useState(true);
-  const [eyeClick, setEyeClick] = React.useState(true);
+  const [loginType, setLoginType] = useState('');
+  const [phone, setPhone] = useState('0354597106');
+  const [password, setPassword] = useState('123');
+  const [data, setData] = useState([]);
+  const [footerVisible, setFooterVisible] = useState(true);
+  const [eyeClick, setEyeClick] = useState(true);
 
-  React.useEffect(() => {
+ useEffect(() => {
     Keyboard.addListener('keyboardDidShow', () => setFooterVisible(false));
     Keyboard.addListener('keyboardDidHide', () => setFooterVisible(true));
     return () => {
@@ -42,7 +42,7 @@ const Login = props => {
     };
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getData();
   }, []);
   const getData = () => {
