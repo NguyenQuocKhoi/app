@@ -72,7 +72,7 @@ function Friend_banbe(props) {
             marginLeft: 10,
           }}
           placeholderTextColor="white"
-          placeholder="Tìm kiếm"
+          placeholder="Search"
           onPressIn={() =>
             props.navigation.navigate('Friend_timkiem')
           }></TextInput>
@@ -98,7 +98,7 @@ function Friend_banbe(props) {
                     }
                   : null,
               ]}>
-              Bạn bè
+              Friends
             </TextButton>
           </Pressable>
           <Pressable
@@ -117,7 +117,7 @@ function Friend_banbe(props) {
                     }
                   : null,
               ]}>
-              Nhóm
+              Groups
             </TextButton>
           </Pressable>
         </View>
@@ -150,10 +150,10 @@ function Friend_banbe(props) {
                       <GroupImg
                         source={require('../../images/icons8-group-24.png')}></GroupImg>
                     </View>
-                    <Text style={{marginLeft: 10, fontSize: 20}}>Lời mời</Text>
+                    <Text style={{marginLeft: 10, fontSize: 20}}>Invitation</Text>
                   </View>
                 </TouchableOpacity>
-                <TouchableOpacity>
+              
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <View
                       style={{
@@ -168,11 +168,11 @@ function Friend_banbe(props) {
                       <GroupImg
                         source={require('../../images/icons8-contact-64.png')}></GroupImg>
                     </View>
-                    <Text style={{marginLeft: 10, fontSize: 20}}>
-                      Danh sách bạn bè
+                    <Text style={{marginLeft: 10, fontSize: 20 }}>
+                      List friend
                     </Text>
                   </View>
-                </TouchableOpacity>
+               
               </View>
               <View style={{margin: 10, height: 450}}>
                 <ScrollView
@@ -188,7 +188,7 @@ function Friend_banbe(props) {
             <View>
               <View>
                 <Text style={{fontSize: 20, marginTop: 10, marginLeft: 10}}>
-                  Danh sách nhóm
+                  Groups
                 </Text>
               </View>
             </View>

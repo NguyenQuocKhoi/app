@@ -11,9 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import {RadioButton} from 'react-native-paper';
-import {BASE_URL, getToken, getUserId, getUserStorage} from '../../utils';
-import {putApiWithToken} from '../../config/Axios';
-// import { Button, Input } from '../../components';
+import {BASE_URL, getToken, getUserId} from '../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSelector} from 'react-redux';
 import axios from 'axios';
@@ -67,7 +65,6 @@ function Profile_1(props) {
         if (!result.cancelled) {
           console.log(result.assets[0].uri);
           setImg(result.assets[0].uri);
-          // If you want to use the URI directly, you can do so:
           await setUrlImage(result.assets[0].uri);
         } else {
           console.log('User cancelled the camera');
@@ -77,6 +74,29 @@ function Profile_1(props) {
       }
     } catch (error) {
       console.log('Error requesting camera permission:', error);
+    }
+  };
+
+  const handleUpdateInfo = async () => {
+    const userId = await getUserId();
+    const token = await getToken();
+    const data = {
+      name: inputName,
+      gender: inputGender,
+    };
+    console.log(data);
+    try {
+      const result = await axios.put(`${BASE_URL}/users/${userId}`, data, {
+        headers: {
+          'auth-token': `${token}`,
+        },
+      });
+      if (result.status === 200) {
+        setUser(result.data); //
+        console.log(result.data);
+      }
+    } catch (error) {
+      console.log('err=', error);
     }
   };
 
@@ -139,7 +159,6 @@ function Profile_1(props) {
         <Text style={{marginVertical: 15}}>Profile</Text>
         <View style={{flexDirection: 'row'}}>
           <Image
-            // source={require('../../images/user.png')}
             src={
               urlImage
                 ? urlImage
@@ -203,10 +222,6 @@ function Profile_1(props) {
 
       <View>
         {!isUpdate ? (
-          // <Button
-          //   title="Update"
-          //   style={{ marginVertical: 15 }}
-          //   onPress={() => setIsUpdate(!isUpdate)}></Button>
           <BtnUpdate>
             <TouchableOpacity onPress={() => setIsUpdate(!isUpdate)}>
               <TextBtnUpdate>Update</TextBtnUpdate>
@@ -214,19 +229,18 @@ function Profile_1(props) {
           </BtnUpdate>
         ) : (
           <View>
-            {/* <Button
-              title="Update"
-              style={{ marginVertical: 15 }}
-              onPress={() => handleUpdateAvatar()}></Button>
-            <Button
-              title="Cancel"
-              style={{ marginVertical: 15 }}
-              onPress={() => setIsUpdate(!isUpdate)}></Button> */}
             <BtnUpdate>
-              <TouchableOpacity onPress={() => handleUpdateAvatar()}>
-                <TextBtnUpdate>Update</TextBtnUpdate>
+              <TouchableOpacity onPress={() => handleUpdateInfo()}>
+                <TextBtnUpdate>Update Info</TextBtnUpdate>
               </TouchableOpacity>
             </BtnUpdate>
+
+            <BtnUpdate>
+              <TouchableOpacity onPress={() => handleUpdateAvatar()}>
+                <TextBtnUpdate>Update avatar</TextBtnUpdate>
+              </TouchableOpacity>
+            </BtnUpdate>
+
             <BtnUpdate>
               <TouchableOpacity onPress={() => setIsUpdate(!isUpdate)}>
                 <TextBtnUpdate>Cancel</TextBtnUpdate>

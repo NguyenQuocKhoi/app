@@ -59,8 +59,8 @@ function Friend_received(props) {
           <BackImg
             source={require('../../images/icons8-back-50.png')}></BackImg>
         </TouchableOpacity>
-        <View style={{marginLeft: -150}}>
-          <Text style={{fontSize: 20, color: 'white'}}>Lời mời kết bạn</Text>
+        <View style={{marginLeft: -180}}>
+          <Text style={{fontSize: 20, color: 'white'}}>Invitation</Text>
         </View>
         <TouchableOpacity>
           <SettingImg
@@ -69,8 +69,8 @@ function Friend_received(props) {
       </Header>
 
       <View style={{height: 40, justifyContent: 'center'}}>
-        <Text style={{fontSize: 20, marginLeft: 10}}>
-          Đã nhận(
+        <Text style={{fontSize: 20, marginLeft: 10, color: 'black'}}>
+          Pending requests(
           {pendingRequests?.length > 0 ? pendingRequests.length : 0})
         </Text>
       </View>

@@ -83,7 +83,7 @@ function CardUser({data}) {
         <View style={{flexDirection: 'column'}}>
           <Text style={{fontSize: 20, color: 'black'}}>{data.name}</Text>
           <View style={{flexDirection: 'row'}}>
-            <Text style={{fontSize: 15}}>Số điện thoại: </Text>
+            <Text style={{fontSize: 15}}>Phone number: </Text>
             <Text style={{fontSize: 15, color: 'blue'}}>{data.phone}</Text>
           </View>
         </View>

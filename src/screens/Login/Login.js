@@ -28,7 +28,7 @@ import axios from 'axios';
 const Login = props => {
   const [loginType, setLoginType] = React.useState('');
   const [phone, setPhone] = React.useState('');
-  const [password, setPassword] = React.useState('123');
+  const [password, setPassword] = React.useState('');
   const [data, setData] = React.useState([]);
   const [footerVisible, setFooterVisible] = React.useState(true);
   const [eyeClick, setEyeClick] = React.useState(true);
@@ -42,9 +42,9 @@ const Login = props => {
     };
   }, []);
 
-  // React.useEffect(() => {
-  //   getData();
-  // }, []);
+  React.useEffect(() => {
+    getData();
+  }, []);
   const getData = () => {
     try {
       AsyncStorage.getItem('user').then(value => {
@@ -64,7 +64,6 @@ const Login = props => {
         password: password,
       };
       try {
-        
         const result = await axios.post(`${BASE_URL}/auth/login`, data);
         if (result.data) {
           console.log(result.data);
@@ -142,7 +141,7 @@ const Login = props => {
             </View>
           </Animatable.View>
         )}
-        {footerVisible ? (
+      
           <FooterTextBtn onPress={() => props.navigation.navigate('SignUp')}>
             <SafeAreaView>
               <FooterText>
@@ -150,7 +149,8 @@ const Login = props => {
               </FooterText>
             </SafeAreaView>
           </FooterTextBtn>
-        ) : null}
+       
+        
       </View>
     </>
   );

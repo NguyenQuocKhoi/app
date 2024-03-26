@@ -59,6 +59,8 @@ export function Signup(props) {
         } else {
           Alert.alert('Registration successful');
           props.navigation.navigate('Login');
+          //
+          
         }
       } catch (error) {
         console.error('API request failed:', error);

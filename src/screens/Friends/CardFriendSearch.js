@@ -101,7 +101,7 @@ function Friend_timkiem() {
               marginLeft: 5,
             }}
             placeholderTextColor='gray'
-            placeholder="  Tìm kiếm"
+            placeholder="  Search"
             onChangeText={setInputSearch}
           ></TextInput>
         </View>

@@ -78,7 +78,7 @@ export default function CardFriend({data}) {
       })
       if (result.status === 200) {
         await dispatch(getBlocks(`/users/${userID}`),);
-        Alert.alert("Chặn thành công");
+        Alert.alert("success");
       }
     } catch (error) {
       console.log(error);
@@ -101,7 +101,7 @@ export default function CardFriend({data}) {
       })
       if (result.status === 200) {
         await dispatch(getBlocks(`/users/${userID}`),);
-        Alert.alert("Hủy chặn thành công");
+        Alert.alert("success");
       }
     } catch (error) {
       console.log(error);
@@ -132,11 +132,11 @@ export default function CardFriend({data}) {
         <View style={{width: 84, alignItems: 'center'}}>
           {!blocked?.includes(data._id) ? (
             <TouchableOpacity onPress={() => handleblock()}>
-              <Text style={{fontSize: 20}}>Chặn</Text>
+              <Text style={{fontSize: 20}}>Block</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity onPress={() => handleUnblock()}>
-              <Text style={{fontSize: 20}}>Hủy chặn</Text>
+              <Text style={{fontSize: 20}}>Unblock</Text>
             </TouchableOpacity>
           )}
         </View>
