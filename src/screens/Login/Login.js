@@ -6,7 +6,6 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-// import {Button, Input, Text, Text as TextComp} from '../../components';
 import {
   FooterTextBtn,
   FooterText,

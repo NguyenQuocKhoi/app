@@ -23,15 +23,13 @@ export default function CardChat({ data }) {
     id => id === userRecipient._id
   );
 
-  // const isOnline = Object.keys(usersOnline).includes(userRecipient._id);
-  // const isOnline = usersOnline.hasOwnProperty(userRecipient._id);
-
   const currentMessage = useSelector(
     state => state.messageReducer.currentMessage,
   );
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  //get user
+
+  
   useEffect(() => {
     const getData = async () => {
       const userId = await getUserId();
