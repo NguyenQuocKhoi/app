@@ -24,6 +24,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {BASE_URL, checkPhoneValid} from '../../utils';
 import {Alert} from 'react-native';
 import axios from 'axios';
+import auth from '@react-native-firebase/auth';
 const Login = props => {
   const [loginType, setLoginType] = useState('');
   const [phone, setPhone] = useState('0354597106');
@@ -31,6 +32,9 @@ const Login = props => {
   const [data, setData] = useState([]);
   const [footerVisible, setFooterVisible] = useState(true);
   const [eyeClick, setEyeClick] = useState(true);
+  const [confirm, setConfirm] = useState(null);
+  const [code, setCode] = useState('');
+  const [verified, setVerified] = useState(false);
 
  useEffect(() => {
     Keyboard.addListener('keyboardDidShow', () => setFooterVisible(false));
@@ -57,6 +61,12 @@ const Login = props => {
   };
 
   const handleLogin = async () => {
+    if(!verified){
+      Alert.alert('Please verify code');
+      return;
+    }
+
+
     if (checkPhoneValid(phone)) {
       let data = {
         phone: phone,
@@ -76,6 +86,31 @@ const Login = props => {
       }
     } else {
       Alert.alert('Invalid Phone');
+    }
+  };
+
+  const sendOtp = async () => {
+    if (checkPhoneValid(phone)) {
+      try {
+        const phoneNumber = '+84' + phone; 
+        // const phoneNumber = '+1' + "6505550333"; 
+        const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+        setConfirm(confirmation);
+      } catch (error) {
+        Alert.alert( "some thing went wrong");
+      }
+    } else {
+      Alert.alert('Invalid Phone');
+    }
+  };
+  const confirmCode = async () => {
+    try {
+      const result = await confirm.confirm(code);
+      if (result) {
+        setVerified(true);
+      }
+    } catch (error) {
+      Alert.alert('Invalid code');
     }
   };
 
@@ -132,6 +167,24 @@ const Login = props => {
                   <Text style={{color: '#3399FF'}}>View</Text>
                 </TouchableOpacity>
               </View>
+              {/* verify code */}
+              <BtnLogin>
+                <TouchableOpacity onPress={() => sendOtp()}>
+                  <TextBtnLogin>sendOtp</TextBtnLogin>
+                </TouchableOpacity>
+              </BtnLogin>
+              <TextInput
+                  placeholder="Code"
+                  value={code}
+                  onChangeText={setCode}
+                  secureTextEntry={eyeClick}>
+                </TextInput>
+              <BtnLogin>
+                <TouchableOpacity onPress={() => confirmCode()}>
+                  <TextBtnLogin>verify</TextBtnLogin>
+                </TouchableOpacity>
+              </BtnLogin>
+              {/* verify code */}
               <BtnLogin>
                 <TouchableOpacity onPress={() => handleLogin()}>
                   <TextBtnLogin>Login</TextBtnLogin>
