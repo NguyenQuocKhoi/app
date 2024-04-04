@@ -39,7 +39,14 @@ const Login = props => {
  useEffect(() => {
     Keyboard.addListener('keyboardDidShow', () => setFooterVisible(false));
     Keyboard.addListener('keyboardDidHide', () => setFooterVisible(true));
+    const subscriber= auth().onAuthStateChanged((user)=> {
+      if(user.phoneNumber === "+84" +phone){
+        setVerified(true);
+        handleLogin();
+      }
+    });
     return () => {
+      subscriber;
       Keyboard.removeAllListeners('keyboardDidShow');
       Keyboard.removeAllListeners('keyboardDidHide');
     };
@@ -95,8 +102,11 @@ const Login = props => {
         const phoneNumber = '+84' + phone; 
         // const phoneNumber = '+1' + "6505550333"; 
         const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+        confirmation.set
+        console.log(confirmation);
         setConfirm(confirmation);
       } catch (error) {
+        console.log(error);
         Alert.alert( "some thing went wrong");
       }
     } else {
@@ -111,6 +121,7 @@ const Login = props => {
       }
     } catch (error) {
       Alert.alert('Invalid code');
+      console.log(error);
     }
   };
 
