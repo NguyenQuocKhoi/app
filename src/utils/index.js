@@ -1,13 +1,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAPiNoneToken } from '../config/Axios';
 import { useSelector } from 'react-redux';
-export const checkPhoneValid = email => {
+export const checkPhoneValid = phoneNumber => {
   var filter = /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/;
-  if (!filter.test(email)) {
+  if (!filter.test(phoneNumber)) {
     return false;
   }
   return true;
 };
+
+export const checkPasswordValid = password => {
+  var filter = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
+  if (!filter.test(password)) {
+    return false;
+  }
+  return true;
+};
+
 
 export const  BASE_URL = "http://192.168.1.8:3000/api";
 
