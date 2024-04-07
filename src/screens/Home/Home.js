@@ -104,6 +104,7 @@ function Home(props) {
 
   useEffect(() => {
     getConversations();
+    
     // getAllContacts();
   }, []);
 

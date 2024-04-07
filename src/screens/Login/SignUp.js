@@ -108,9 +108,9 @@ export function Signup(props) {
           } else {
             Alert.alert('Registration successful');
             console.log(result.data);
-            await AsyncStorage.setItem('user', JSON.stringify(result.data));
-            props.navigation.navigate('HomeScreenNav');
-            // props.navigation.navigate('Login');
+            // await AsyncStorage.setItem('user', JSON.stringify(result.data));
+            // props.navigation.navigate('HomeScreenNav');
+            props.navigation.navigate('Login');
             //
           }
         } catch (error) {
