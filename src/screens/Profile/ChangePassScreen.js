@@ -134,7 +134,7 @@ export const ChangePasswordScreen = props => {
               }}>
               <TextInput
                 placeholder="Password"
-                // value={oldPassword}
+                value={oldPassword}
                 secureTextEntry={eyeClick}
                 onChangeText={setOldPassword}></TextInput>
             </View>

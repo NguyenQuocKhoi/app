@@ -5,31 +5,31 @@ export const Header = styled.View`
   justify-content: space-between;
   background-color: #3399ff;
   align-items: center;
-  height: 50;
+  height: 50px;
 `;
 
 export const HeaderAddMember = styled.View`
   flex-direction: row;
   background-color: #3399ff;
   align-items: center;
-  height: 50;
+  height: 50px;
 `;
 
 export const AddFriendImg = styled.Image`
-  margin-right: 10;
+  margin-right: 10px;
   width: 25px;
   height: 30px;
 `;
 
 export const SearchImg = styled.Image`
-  margin-left: 10;
+  margin-left: 10px;
   width: 25px;
   height: 30px;
 `;
 
 export const LeaveGroupImg = styled.Image`
-  margin-left: 10;
-  margin-right: 10;
+  margin-left: 10px;
+  margin-right: 10px;
   width: 24px;
   height: 24px;
 `;
@@ -42,43 +42,43 @@ export const AddFriendImg1 = styled.Image`
 `;
 
 export const BackImg = styled.Image`
-  margin-left: 10;
+  margin-left: 10px;
   width: 25px;
   height: 30px;
 `;
 
 export const PhoneImg = styled.Image`
-  margin-left: 10;
+  margin-left: 10px;
   width: 25px;
   height: 25px;
 `;
 
 export const VideoCallImg = styled.Image`
-  margin-left: 0;
+  margin-left: 0px;
   width: 25px;
   height: 25px;
 `;
 
 export const ListImg = styled.Image`
-  margin-right: 10;
+  margin-right: 10px;
   width: 25px;
   height: 30px;
 `;
 
 export const SendImg = styled.Image`
-  margin-right: 10;
+  margin-right: 10px;
   width: 32px;
   height: 32px;
 `;
 
 export const FaceImg = styled.Image`
-  margin-left: 10;
+  margin-left: 10px;
   width: 32px;
   height: 32px;
 `;
 
 export const ImageImg = styled.Image`
-  margin-right: 10;
+  margin-right: 10px;
   width: 32px;
   height: 32px;
 `;
@@ -92,19 +92,19 @@ export const CrossImg = styled.Image`
 `;
 
 export const MicrophoneImg = styled.Image`
-  margin-right: 10;
+  margin-right: 10px;
   width: 25px;
   height: 25px;
 `;
 
 export const MoreImg = styled.Image`
-  margin-right: 10;
+  margin-right: 10px;
   width: 25px;
   height: 25px;
 `;
 
 export const BaCham = styled.Image`
-  margin-right: 10;
+  margin-right: 10px;
   width: 25px;
   height: 30px;
   tintColor: black;

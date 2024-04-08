@@ -42,7 +42,7 @@ export const TextLogin = styled.Text`
   color: black;
   text-align: center;
   margin: 12px;
-  font-weight: 700px;
+  font-weight: 700;
  
 `;
 
@@ -56,7 +56,7 @@ export const TextL = styled.Text`
   font-size: 18px;
   color: black;
   margin-left: 5px;
-  font-weight:500px;
+  font-weight:500;
   margin-bottom: 10px;
 `;
 
@@ -65,7 +65,7 @@ export const TextSignUp = styled.Text`
   color: black;
   text-align: center;
   margin: 12px;
-  font-weight: 700px;
+  font-weight: 700;
 `;
 
 export const TextBtnSignUp = styled.Text`
@@ -113,7 +113,7 @@ export const BtnLogin = styled.View`
     height: 2px;
   }
   shadowopacity: 0.17;
-  shadowradius: 2.54;
+  shadowradius: 2.54px;
   margin-top:20px;
 `;
 

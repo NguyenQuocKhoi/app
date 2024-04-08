@@ -17,11 +17,12 @@ export default function CardChat({ data }) {
   const [userRecipient, setUserRecipient] = useState({});
   const usersOnline = useSelector(state => state.userReducer.usersOnline);
   const [lastTime, setLastTime] = useState('');
+  const [isOnline, setIsOnline] = useState(null);
   const [lastMessage, setLastMessage] = useState('');
 
-  const isOnline = Object.keys(usersOnline).find(
-    id => id === userRecipient._id
-  );
+  // const isOnline = Object.keys(usersOnline).find(
+  //   id => id === userRecipient._id
+  // );
 
   const currentMessage = useSelector(
     state => state.messageReducer.currentMessage,
@@ -35,6 +36,7 @@ export default function CardChat({ data }) {
       const userId = await getUserId();
       getLastMessage();
       const recipient = data.users.find(user => user._id !== userId);
+      setIsOnline(Object.keys(usersOnline).includes(recipient._id));
       setUserRecipient(recipient);
     };
     getData();
@@ -59,8 +61,6 @@ export default function CardChat({ data }) {
     //   }
     //   setLastTime(last?.createdAt);
     // }
-
-    //thử gửi ảnh
     if (result.status === 200) {
       const last = result.data[result.data?.length - 1];
       if (last.user._id === userId) {

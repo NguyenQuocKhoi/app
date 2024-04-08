@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { BASE_URL, getUserId, getToken } from '../../utils';
+import React, {useEffect, useRef, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {BASE_URL, getUserId, getToken} from '../../utils';
 import axios from 'axios';
 import {
   getMessageSocket,
   sendMessageSocket,
   newConversationSocket,
+  socket,
+  initiateSocket,
 } from '../../utils/socket';
 import {
   getCurrentMessage,
@@ -22,8 +24,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SendingContent from './SendingContent';
 import ReceivingContent from './ReceivingContent';
-import { ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {ScrollView} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import {
   BackImg,
   FaceImg,
@@ -42,10 +44,15 @@ import {
 import {
   launchCamera,
   launchImageLibrary,
-  ImagePicker
+  ImagePicker,
 } from 'react-native-image-picker';
-import { Image } from 'react-native';
+import {Image} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
+import {handleGetUsersOnline} from '../../redux/userSlice';
+import {
+  getAllConversations,
+  handleNewConversation,
+} from '../../redux/conversationsSlice';
 export default function Chat() {
   const [inputMessage, setInputMessage] = useState('');
   const scrollRef = useRef(null);
@@ -65,6 +72,49 @@ export default function Chat() {
   const isOnline = Object.keys(usersOnline).find(id => id === recipient?._id);
   const [img, setImg] = useState([]);
   // console.log(img);
+
+  useEffect(() => {
+    getInitiateSocket();
+  }, []);
+
+  useEffect(() => {
+    if (socket === null) return;
+    // console.log(socket);
+    socket.on('receiveMessage', res => {
+      dispatch(handleSetCurrentMessage(res));
+    });
+    socket.on('usersOnline', res => {
+      dispatch(handleGetUsersOnline(res));
+    });
+    socket.on('receiveNewConversation', res => {
+      dispatch(handleNewConversation(res));
+    });
+    getConversations();
+    // getAllContacts();
+    return () => {
+      socket.off('receiveMessage');
+      socket.off('usersOnline');
+      socket.off('receiveNewConversation');
+    };
+  }, [socket]);
+
+  const getInitiateSocket = async () => {
+    const userId = await getUserId();
+    if (userId) {
+      initiateSocket(userId);
+      setId(userId);
+      // console.log(1);
+    }
+  };
+
+  const getConversations = async () => {
+    try {
+      const userId = await getUserId();
+      await dispatch(getAllConversations(userId));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handlSendImages = async () => {
     try {
@@ -138,7 +188,7 @@ export default function Chat() {
       const token = await getToken();
       const docs = await DocumentPicker.pick({
         type: [DocumentPicker.types.pdf],
-        allowMultiSelection: true
+        allowMultiSelection: true,
       });
 
       const formData = new FormData();
@@ -148,10 +198,10 @@ export default function Chat() {
           type: docs[i].type,
           name: docs[i].name,
         };
-        formData.append("file", file);
+        formData.append('file', file);
       }
-      formData.append("conversationId", selectedConversation._id);
-      formData.append("user", userId);
+      formData.append('conversationId', selectedConversation._id);
+      formData.append('user', userId);
 
       try {
         const result = await axios.post(
@@ -179,15 +229,12 @@ export default function Chat() {
       }
     } catch (error) {
       if (DocumentPicker.isCancel(error))
-        console.log("User cancelled the upload", error);
-      else
-        console.log(error);
+        console.log('User cancelled the upload', error);
+      else console.log(error);
     }
-  }
+  };
 
-  const handleSendLocation = () => {
-
-  }
+  const handleSendLocation = () => {};
 
   const uploadFile = async () => {
     try {
@@ -196,7 +243,7 @@ export default function Chat() {
       const docs = await DocumentPicker.pick({
         // type: [DocumentPicker.types.pdf||DocumentPicker.types.docx||DocumentPicker.types.pptx],
         type: [DocumentPicker.types.allFiles],
-        allowMultiSelection: true
+        allowMultiSelection: true,
       });
 
       const formData = new FormData();
@@ -206,10 +253,10 @@ export default function Chat() {
           type: docs[i].type,
           name: docs[i].name,
         };
-        formData.append("file", file);
+        formData.append('file', file);
       }
-      formData.append("conversationId", selectedConversation._id);
-      formData.append("user", userId);
+      formData.append('conversationId', selectedConversation._id);
+      formData.append('user', userId);
 
       try {
         const result = await axios.post(
@@ -237,9 +284,8 @@ export default function Chat() {
       }
     } catch (error) {
       if (DocumentPicker.isCancel(error))
-        console.log("User cancelled the upload", error);
-      else
-        console.log(error);
+        console.log('User cancelled the upload', error);
+      else console.log(error);
     }
   };
 
@@ -288,25 +334,25 @@ export default function Chat() {
     }
   }, [currentMessage, selectedConversation]);
 
-  useEffect(() => {
-    getId();
-  }, []);
-  const getId = async () => {
-    try {
-      const value = await AsyncStorage.getItem('user');
-      if (value !== null) {
-        const user = JSON.parse(value);
-        // console.log('token: ',user.user._id);
-        setId(user.user._id);
-      }
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  };
+  // useEffect(() => {
+  //   getId();
+  // }, []);
+  // const getId = async () => {
+  //   try {
+  //     const value = await AsyncStorage.getItem('user');
+  //     if (value !== null) {
+  //       const user = JSON.parse(value);
+  //       // console.log('token: ',user.user._id);
+  //       setId(user.user._id);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     throw error;
+  //   }
+  // };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F2FFFF' }}>
+    <View style={{flex: 1, backgroundColor: '#F2FFFF'}}>
       <Header>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <BackImg
@@ -341,7 +387,7 @@ export default function Chat() {
             source={require('../../images/icons8-list-24.png')}></ListImg>
         </TouchableOpacity>
       </Header>
-      <View style={{ marginTop: 20, marginLeft: 10, marginRight: 10, flex: 3 }}>
+      <View style={{marginTop: 20, marginLeft: 10, marginRight: 10, flex: 3}}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
@@ -349,7 +395,7 @@ export default function Chat() {
           {currentMessage?.map((item, index) => {
             if (item.user._id === userId) {
               return (
-                <ScrollView key={index}>
+                <ScrollView key={index._id}>
                   <SendingContent data={item} />
                 </ScrollView>
               );
@@ -374,15 +420,11 @@ export default function Chat() {
             alignItems: 'center',
             backgroundColor: 'white',
           }}>
-          <TouchableOpacity
-            onPress={() => uploadVideo()}
-          >
+          <TouchableOpacity onPress={() => uploadVideo()}>
             <FaceImg
               source={require('../../images/icons8-video-50.png')}></FaceImg>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => { }}
-          >
+          <TouchableOpacity onPress={() => {}}>
             <FaceImg
               source={require('../../images/icons8-location-50.png')}></FaceImg>
           </TouchableOpacity>
@@ -398,9 +440,7 @@ export default function Chat() {
             placeholder="Tin nhắn"
             onChangeText={setInputMessage}
             value={inputMessage}></TextInput>
-          <TouchableOpacity
-            onPress={() => uploadFile()}
-          >
+          <TouchableOpacity onPress={() => uploadFile()}>
             <MoreImg
               source={require('../../images/icons8-more-48.png')}></MoreImg>
           </TouchableOpacity>

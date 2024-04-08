@@ -27,14 +27,14 @@ import axios from 'axios';
 const Login = props => {
   const [loginType, setLoginType] = useState('');
   const [phone, setPhone] = useState('0354597107');
-  const [password, setPassword] = useState('Khoi123');
+  const [password, setPassword] = useState('Khoi12345');
   const [data, setData] = useState([]);
   const [footerVisible, setFooterVisible] = useState(true);
   const [eyeClick, setEyeClick] = useState(true);
   const [notification, setNotification] = useState('');
 
   useEffect(() => {
-    getData();
+    // getData();
   }, []);
   const getData = () => {
     try {

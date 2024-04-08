@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useState } from 'react';
+import React, {useEffect, useId, useState} from 'react';
 import {
   View,
   FlatList,
@@ -8,41 +8,50 @@ import {
   Text,
   TextInput,
   Modal,
-  Button
+  Button,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AddFriendImg, AddFriendImg1, CrossImg, Header, PlusImg, QrImg, SearchImg } from './styles1';
-import Chat from '../Conservation/Chat';
-import { useDispatch, useSelector } from 'react-redux';
 import {
-  disconnectSocket,
-  getMessageSocket,
-  getReceiveNewConverstionsoket,
-  getUsersOnline,
+  AddFriendImg,
+  AddFriendImg1,
+  CrossImg,
+  Header,
+  PlusImg,
+  QrImg,
+  SearchImg,
+} from './styles1';
+import Chat from '../Conservation/Chat';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  // disconnectSocket,
+  // getMessageSocket,
+  // getReceiveNewConverstionsoket,
+  // getUsersOnline,
   initiateSocket,
   socket,
 } from '../../utils/socket';
-import { getContacts, handleGetUsersOnline } from '../../redux/userSlice';
+import {getContacts, handleGetUsersOnline} from '../../redux/userSlice';
 import {
   getAllConversations,
   handleNewConversation,
   selectConversation,
 } from '../../redux/conversationsSlice';
-import { getUserId } from '../../utils';
+import {getUserId, getToken} from '../../utils';
 import CardChat from '../Conservation/CardChat';
-import { handleSetCurrentMessage } from '../../redux/messageSlice';
-import { ScrollView } from 'react-native';
-import { ModalPicker } from '../../components/Modal/ModalPicker';
+import {handleSetCurrentMessage} from '../../redux/messageSlice';
+import {ScrollView} from 'react-native';
+import {ModalPicker} from '../../components/Modal/ModalPicker';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 function Home(props) {
   const [userData, setUserData] = React.useState('');
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [notiAddMember, setNotiAddMember] = useState("");
+  // const [notiAddMember, setNotiAddMember] = useState('');
   const allConversations = useSelector(
     state => state.conversationReducer.allConversation,
   );
   const dispatch = useDispatch();
-  const onPressItem = (option) => {
+  const onPressItem = option => {
     setModalVisible(false);
     if (option === 'Create group') {
       props.navigation.navigate('GroupScreen');
@@ -51,62 +60,21 @@ function Home(props) {
     }
   };
 
-  const handleNotiAddMember = (noti) => {
-    setNotiAddMember(noti);
-  };
-
   useEffect(() => {
-    const getdata = async () => {
-      const userId = await getUserId();
-      // console.log(userId);
-      if (userId) {
-        initiateSocket(userId);
-        handleUserOnline();
-        handleGetMessageSocket();
-        handleNewConverstionsocket();
-      }
-      return () => {
-        disconnectSocket();
-      };
-    };
-    getdata();
+    getInitiateSocket();
   }, []);
 
-  const handleUserOnline = async () => {
-    await getUsersOnline()
-      .then(result => {
-        dispatch(handleGetUsersOnline(result));
-      })
-      .catch(error => {
-        console.log(error);
-      });
+  const getInitiateSocket = async () => {
+    const userId = await getUserId();
+    if (userId) {
+      initiateSocket(userId);
+      // console.log(1);
+    }
   };
 
-  const handleNewConverstionsocket = async () => {
-    await getReceiveNewConverstionsoket()
-      .then(result => {
-        dispatch(handleNewConversation(result));
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-
-  const handleGetMessageSocket = async () => {
-    await getMessageSocket()
-      .then(result => {
-        dispatch(handleSetCurrentMessage(result));
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-
-  useEffect(() => {
+  useEffect(()=>{
     getConversations();
-    
-    // getAllContacts();
-  }, []);
+  },[])
 
   const getConversations = async () => {
     try {
@@ -116,18 +84,10 @@ function Home(props) {
       console.log(error);
     }
   };
-  
-  // const getAllContacts = async () => {
-  //   const userId = await getUserId();
-  //   try {
-  //     await dispatch(getContacts(userId));
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+
 
   return (
-    <View style={{ marginBottom: 50 }}>
+    <View style={{marginBottom: 50}}>
       <Header>
         <TouchableOpacity>
           <SearchImg
@@ -149,8 +109,7 @@ function Home(props) {
             props.navigation.navigate('Friend_timkiem')
           }></TextInput>
 
-        <TouchableOpacity
-        >
+        <TouchableOpacity>
           <QrImg source={require('../../images/icons8-qr-24.png')}></QrImg>
         </TouchableOpacity>
 
@@ -159,30 +118,40 @@ function Home(props) {
           visible={modalVisible}
           onRequestClose={() => {
             setModalVisible(false);
-          }}
-        >
-          <View style={{flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.005)', alignItems: 'flex-end', justifyContent: 'flex-start'}}>
-            <View style={{ backgroundColor: 'white', alignItems: 'flex-end', width: 130, marginTop: 10, marginRight: 10, borderRadius: 5}}>
-            <TouchableOpacity
+          }}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.005)',
+              alignItems: 'flex-end',
+              justifyContent: 'flex-start',
+            }}>
+            <View
+              style={{
+                backgroundColor: 'white',
+                alignItems: 'flex-end',
+                width: 130,
+                marginTop: 10,
+                marginRight: 10,
+                borderRadius: 5,
+              }}>
+              <TouchableOpacity
                 onPress={() => onPressItem('Add friend')}
-                style={{flexDirection: 'row', margin: 10}}
-              >
+                style={{flexDirection: 'row', margin: 10}}>
                 <AddFriendImg1
                   source={require('../../images/icons8-add-friend-24.png')}></AddFriendImg1>
                 <Text>Add friend</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => onPressItem('Create group')}
-                style={{flexDirection: 'row', margin: 10}}
-              >
+                style={{flexDirection: 'row', margin: 10}}>
                 <AddFriendImg1
                   source={require('../../images/icons8-group-24.png')}></AddFriendImg1>
                 <Text>Create group</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={()=>setModalVisible(false)}
-                style={{flexDirection: 'row', margin: 10}}
-              >
+                onPress={() => setModalVisible(false)}
+                style={{flexDirection: 'row', margin: 10}}>
                 <CrossImg
                   source={require('../../images/icons8-cross-30.png')}></CrossImg>
                 <Text style={{marginRight: 35}}>Cancel</Text>
@@ -191,9 +160,7 @@ function Home(props) {
           </View>
         </Modal>
 
-        <TouchableOpacity
-          onPress={() => setModalVisible(true)}
-        >
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
           <PlusImg
             source={require('../../images/icons8-plus-24.png')}></PlusImg>
         </TouchableOpacity>

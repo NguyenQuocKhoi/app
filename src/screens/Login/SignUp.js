@@ -74,7 +74,8 @@ export function Signup(props) {
           Alert.alert('Phone already exist');
         })
         .catch(error => {
-          console.log(error);
+          // console.log(1);
+          // console.log(error);
         });
     }
   };
@@ -90,10 +91,10 @@ export function Signup(props) {
   };
 
   const handleSignUp = async () => {
-    if (!verified) {
-      Alert.alert('Please verify code');
-      return;
-    }
+    // if (!verified) {
+    //   Alert.alert('Please verify code');
+    //   return;
+    // }
     if (checkPhoneValid(phone)) {
       if (checkPasswordValid(password)) {
         let data = {
