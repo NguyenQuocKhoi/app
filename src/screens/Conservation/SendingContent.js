@@ -4,10 +4,12 @@ import {
   Image,
   Linking,
   Modal,
+  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import Video from 'react-native-video'
 
 export default function SendingContent({data}) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -23,8 +25,8 @@ export default function SendingContent({data}) {
     setModalContent(imageContent);
     setModalVisible(true);
   };
-
   return (
+  
     <View
       style={{
         backgroundColor: '#CCFFFF',
@@ -33,6 +35,7 @@ export default function SendingContent({data}) {
         borderRadius: 8,
         maxWidth: '70%',
         alignSelf: 'flex-end',
+      
         margin: 5,
       }}>
       <Modal
@@ -95,6 +98,15 @@ export default function SendingContent({data}) {
             </View>
           ))
         : null}
+      {data.video ? (
+        // <View style={{alignItems:'center', justifyContent:'center', height: 200, width:600}}>
+            <Video
+              source={{uri: data.video}}
+              style={{width: 200, height: 200, }}
+              controls={true}
+            />
+            // </View>
+      ): null}
       {data.file ? (
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity onPress={() => handlePress()}>
@@ -113,5 +125,6 @@ export default function SendingContent({data}) {
         {moment(data.createdAt).format('HH:mm')}
       </Text>
     </View>
+  
   );
 }

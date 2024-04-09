@@ -2,6 +2,7 @@ import moment from 'moment';
 import {useState} from 'react';
 import {Image, Linking, Modal, TouchableOpacity, View} from 'react-native';
 import {Text} from 'react-native-animatable';
+import Video from 'react-native-video';
 
 export default function ReceivingContent({data, sender}) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -114,6 +115,13 @@ export default function ReceivingContent({data, sender}) {
             </TouchableOpacity>
           </View>
         ) : null}
+        {data.video ? (
+            <Video
+              source={{uri: data.video}}
+              style={{width: 200, height: 200}}
+              controls={true}
+            />
+      ): null}
         <Text style={{margin: 5, color: 'gray'}}>
           {moment(data.createdAt).format('HH:mm')}
         </Text>

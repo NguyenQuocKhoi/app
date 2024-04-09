@@ -186,26 +186,27 @@ export default function Chat() {
     try {
       const userId = await getUserId();
       const token = await getToken();
-      const docs = await DocumentPicker.pick({
-        type: [DocumentPicker.types.pdf],
+      const videos = await DocumentPicker.pick({
+        type: [DocumentPicker.types.video],
         allowMultiSelection: true,
       });
-
+      console.log(videos);
+      console.log(1);
       const formData = new FormData();
-      for (let i = 0; i < docs.length; i++) {
+      for (let i = 0; i < videos.length; i++) {
         const file = {
-          uri: docs[i].uri,
-          type: docs[i].type,
-          name: docs[i].name,
+          uri: videos[i].uri,
+          type: videos[i].type,
+          name: videos[i].name,
         };
         formData.append('file', file);
       }
       formData.append('conversationId', selectedConversation._id);
       formData.append('user', userId);
-
+  
       try {
         const result = await axios.post(
-          `${BASE_URL}/conversation/sendFile`,
+          `${BASE_URL}/conversation/sendVideo`,
           formData,
           {
             headers: {
@@ -224,7 +225,7 @@ export default function Chat() {
           await dispatch(getCurrentMessage(selectedConversation._id));
         }
       } catch (error) {
-        console.log(1);
+        console.log(2);
         console.log(error);
       }
     } catch (error) {
@@ -233,8 +234,6 @@ export default function Chat() {
       else console.log(error);
     }
   };
-
-  const handleSendLocation = () => {};
 
   const uploadFile = async () => {
     try {
