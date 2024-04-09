@@ -89,6 +89,9 @@ export default function Chat() {
     socket.on('receiveNewConversation', res => {
       dispatch(handleNewConversation(res));
     });
+    socket.on("receiveRemoveMessage", res =>{
+      dispatch(getCurrentMessage(res.conversationId));
+    })
     getConversations();
     // getAllContacts();
     return () => {

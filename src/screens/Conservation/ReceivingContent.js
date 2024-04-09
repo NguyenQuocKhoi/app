@@ -3,10 +3,18 @@ import {useState} from 'react';
 import {Image, Linking, Modal, TouchableOpacity, View} from 'react-native';
 import {Text} from 'react-native-animatable';
 import Video from 'react-native-video';
-
+import axios from 'axios';
+import {useDispatch, useSelector} from 'react-redux';
+import {BASE_URL, getUserId} from '../../utils';
+import {getCurrentMessage} from '../../redux/messageSlice';
+import {removeMessageSocket} from '../../utils/socket';
 export default function ReceivingContent({data, sender}) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState(null);
+  const selectedConversation = useSelector(
+    state => state.conversationReducer.selectedConversation,
+  );
+  const dispatch = useDispatch();
   const senderName = sender.name;
   const handlePress = () => {
     const url = data.file;
@@ -15,10 +23,33 @@ export default function ReceivingContent({data, sender}) {
 
   const showImage = imageUrl => {
     const imageContent = (
-      <Image src={imageUrl} style={{width: 'auto', height: 500, resizeMode:'contain'}} />
+      <Image
+        src={imageUrl}
+        style={{width: 'auto', height: 500, resizeMode: 'contain'}}
+      />
     );
     setModalContent(imageContent);
     setModalVisible(true);
+  };
+
+  const handleRemoveMessage = async () => {
+    const userId = await getUserId();
+    try {
+      const result = await axios.post(
+        `${BASE_URL}/conversation/removeMessage/${data._id}`,
+      );
+      if (result.status === 200) {
+        dispatch(getCurrentMessage(selectedConversation._id));
+        removeMessageSocket({
+          ...data,
+          receiverIds: selectedConversation.users
+            .filter(user => user._id !== userId)
+            .map(user => user._id),
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -32,7 +63,7 @@ export default function ReceivingContent({data, sender}) {
         <View
           style={{flex: 1, backgroundColor: '#C0C0C0'}}
           onPress={() => setModalVisible(false)}>
-          <View style={{flexDirection:'row'}}>
+          <View style={{flexDirection: 'row'}}>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <View
                 style={{
@@ -51,7 +82,16 @@ export default function ReceivingContent({data, sender}) {
                 </Text>
               </View>
             </TouchableOpacity>
-            <Text style={{color: 'black', fontSize: 20, position:'absolute', marginTop:45, marginLeft:10}}>{senderName}</Text>
+            <Text
+              style={{
+                color: 'black',
+                fontSize: 20,
+                position: 'absolute',
+                marginTop: 45,
+                marginLeft: 10,
+              }}>
+              {senderName}
+            </Text>
           </View>
           <View style={{justifyContent: 'center', height: 200, marginTop: 250}}>
             {modalContent}
@@ -116,15 +156,20 @@ export default function ReceivingContent({data, sender}) {
           </View>
         ) : null}
         {data.video ? (
-            <Video
-              source={{uri: data.video}}
-              style={{width: 200, height: 200}}
-              controls={true}
-            />
-      ): null}
+          <Video
+            source={{uri: data.video}}
+            style={{width: 200, height: 200}}
+            controls={true}
+          />
+        ) : null}
         <Text style={{margin: 5, color: 'gray'}}>
           {moment(data.createdAt).format('HH:mm')}
         </Text>
+        <View>
+          <TouchableOpacity onPress={() => handleRemoveMessage()}>
+            <Text style={{color: 'red', alignSelf: 'center'}}>Delete</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

@@ -9,24 +9,54 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Video from 'react-native-video'
-
+import axios from 'axios';
+import Video from 'react-native-video';
+import {BASE_URL, getUserId} from '../../utils';
+import {useDispatch, useSelector} from 'react-redux';
+import {getCurrentMessage} from '../../redux/messageSlice';
+import {removeMessageSocket} from '../../utils/socket';
 export default function SendingContent({data}) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState(null);
+  const selectedConversation = useSelector(
+    state => state.conversationReducer.selectedConversation,
+  );
+  const dispatch = useDispatch();
   const handlePress = () => {
     const url = data.file;
     Linking.openURL(url);
   };
   const showImage = imageUrl => {
     const imageContent = (
-      <Image src={imageUrl} style={{width: 'auto', height: 500, resizeMode:'contain'}} />
+      <Image
+        src={imageUrl}
+        style={{width: 'auto', height: 500, resizeMode: 'contain'}}
+      />
     );
     setModalContent(imageContent);
     setModalVisible(true);
   };
+
+  const handleRemoveMessage = async () => {
+    const userId = await getUserId();
+    try {
+      const result = await axios.post(
+        `${BASE_URL}/conversation/removeMessage/${data._id}`,
+      );
+      if (result.status === 200) {
+        dispatch(getCurrentMessage(selectedConversation._id));
+        removeMessageSocket({
+          ...data,
+          receiverIds: selectedConversation.users
+            .filter(user => user._id !== userId)
+            .map(user => user._id),
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
-  
     <View
       style={{
         backgroundColor: '#CCFFFF',
@@ -35,7 +65,7 @@ export default function SendingContent({data}) {
         borderRadius: 8,
         maxWidth: '70%',
         alignSelf: 'flex-end',
-      
+
         margin: 5,
       }}>
       <Modal
@@ -100,13 +130,13 @@ export default function SendingContent({data}) {
         : null}
       {data.video ? (
         // <View style={{alignItems:'center', justifyContent:'center', height: 200, width:600}}>
-            <Video
-              source={{uri: data.video}}
-              style={{width: 200, height: 200, }}
-              controls={true}
-            />
-            // </View>
-      ): null}
+        <Video
+          source={{uri: data.video}}
+          style={{width: 200, height: 200}}
+          controls={true}
+        />
+      ) : // </View>
+      null}
       {data.file ? (
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity onPress={() => handlePress()}>
@@ -124,7 +154,12 @@ export default function SendingContent({data}) {
       <Text style={{color: 'gray', alignSelf: 'flex-end', margin: 5}}>
         {moment(data.createdAt).format('HH:mm')}
       </Text>
+
+      <View>
+        <TouchableOpacity onPress={() => handleRemoveMessage()}>
+          <Text style={{color:'red', alignSelf:'center'}}>Delete</Text>
+        </TouchableOpacity>
+      </View>
     </View>
-  
   );
 }

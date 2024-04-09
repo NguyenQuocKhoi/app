@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 
-BASE_URL = 'http://192.168.1.6:3300';
+BASE_URL = 'http://192.168.1.8:3300';
 let socket;
 
 const initiateSocket = userId => {
@@ -23,6 +23,12 @@ const sendMessageSocket = message => {
   }
 };
 
+const removeMessageSocket = (receiverId) => {
+  if (socket) {
+    socket.emit("removeMessage", receiverId);
+  }
+};
+
 const disconnectSocket = () => {
   if (socket) {
     socket.disconnect();
@@ -37,4 +43,5 @@ export {
   sendMessageSocket,
   initiateSocket,
   newConversationSocket,
+  removeMessageSocket,
 };
