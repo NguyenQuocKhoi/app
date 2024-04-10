@@ -49,6 +49,7 @@ import {
 import {Image} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import {handleGetUsersOnline} from '../../redux/userSlice';
+import Geolocation from '@react-native-community/geolocation';
 import {
   getAllConversations,
   handleNewConversation,
@@ -184,7 +185,64 @@ export default function Chat() {
       console.log('Error requesting camera permission:', error);
     }
   };
-
+  const handleLocation = async () => {
+  
+    try {
+     
+      const userID = await getUserId();
+      const token = await getToken();
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        const success = async (pos) => {
+          var crd = pos.coords;
+          const location = {
+            latitude: crd.latitude,
+            longitude: crd.longitude,
+          };
+          const data = {
+            conversationId: selectedConversation._id,
+            user: userID,
+            location: location,
+          };
+          try {
+            console.log(data);
+              const result = await axios.post(
+                `${BASE_URL}/conversation/sendLocation`,
+                data,
+                {
+                  headers: {
+                    'auth-token': token,
+                  },
+                },
+              );
+              if (result.status === 200) {
+                sendMessageSocket({
+                  ...result.data,
+                  receiverIds: selectedConversation.users
+                    .filter(user => user._id !== userId)
+                    .map(user => user._id),
+                });
+                await dispatch(getCurrentMessage(selectedConversation._id));
+              }
+            } catch (error) {
+              console.log(error);
+            }
+           console.log(location);
+        }
+           Geolocation.getCurrentPosition(success);
+      } else if (granted === PermissionsAndroid.RESULTS.DENIED) {
+          Alert.alert("You have denied to grant location permission");
+      }
+      else {
+        console.log('Ứng dụng không hỗ trợ viêc cấp quyền');
+      }
+    } catch (error) {
+      console.log(2);
+      console.log(error);
+    }
+  }
   const uploadVideo = async () => {
     try {
       const userId = await getUserId();
@@ -426,7 +484,7 @@ export default function Chat() {
             <FaceImg
               source={require('../../images/icons8-video-50.png')}></FaceImg>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => handleLocation()}>
             <FaceImg
               source={require('../../images/icons8-location-50.png')}></FaceImg>
           </TouchableOpacity>

@@ -70,8 +70,10 @@ export default function CardChat({ data }) {
           setLastMessage(`Bạn: vừa gửi ${last.images.length} ảnh`)
         } else if(last?.video){
           setLastMessage(`Bạn: vừa gửi video`)
-        } else if (last?.file)
+        } else if (last?.file){
           setLastMessage(`Bạn: vừa gửi file`)
+        }else if (last?.location)
+          setLastMessage(`Bạn: vừa gửi vị trí`)
       } else {
         if (last?.text) {
           setLastMessage(last?.text);
@@ -79,8 +81,10 @@ export default function CardChat({ data }) {
           setLastMessage(`Vừa gửi ${last.images.length} ảnh`)
         } else if(last?.video){
           setLastMessage(`Vừa gửi video`)
-        } else if (last?.file)
+        } else if (last?.file){
           setLastMessage(`Vừa gửi file`)
+        }else if (last?.location)
+        setLastMessage(`Vừa gửi vị trí`)
       }
       setLastTime(last?.createdAt);
     }

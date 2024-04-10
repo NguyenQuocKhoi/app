@@ -16,6 +16,7 @@ import {BASE_URL, getUserId} from '../../utils';
 import {useDispatch, useSelector} from 'react-redux';
 import {getCurrentMessage} from '../../redux/messageSlice';
 import {removeMessageSocket} from '../../utils/socket';
+import MapView, { PROVIDER_GOOGLE,Marker } from 'react-native-maps';
 export default function SendingContent({data}) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState(null);
@@ -188,6 +189,25 @@ export default function SendingContent({data}) {
           </TouchableOpacity>
         </View>
       ) : null}
+      {data.location ? (
+          <View >
+            <MapView
+              provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+              style={{ width: 250, height: 300, }}
+              showsUserLocation
+              region={{
+                latitude: data.location.latitude,
+                longitude: data.location.longitude,
+                latitudeDelta: 0.002,
+                longitudeDelta: 0.002,
+              }}
+            >
+              <Marker
+                coordinate={{ latitude: data.location.latitude, longitude: data.location.longitude }}
+              ></Marker>
+            </MapView>
+          </View>
+        ) : null}
       <Text style={{color: 'gray', alignSelf: 'flex-end', margin: 5}}>
         {moment(data.createdAt).format('HH:mm')}
       </Text>
