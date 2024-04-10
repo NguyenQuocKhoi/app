@@ -1,32 +1,41 @@
 import moment from 'moment';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   Image,
   Linking,
   Modal,
   SafeAreaView,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import axios from 'axios';
 import Video from 'react-native-video';
-import {BASE_URL, getUserId} from '../../utils';
+import {BASE_URL, getToken, getUserId} from '../../utils';
 import {useDispatch, useSelector} from 'react-redux';
 import {getCurrentMessage} from '../../redux/messageSlice';
-import {removeMessageSocket} from '../../utils/socket';
-import MapView, { PROVIDER_GOOGLE,Marker } from 'react-native-maps';
+import {removeMessageSocket, sendMessageSocket} from '../../utils/socket';
+import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
+import {getAllConversations} from '../../redux/conversationsSlice';
+import CardChat1 from './CardConversation';
 export default function SendingContent({data}) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState(null);
 
   const [modalVideoVisible, setModalVideoVisible] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [modalVisibleForward, setModalVisibleForward] = useState(false);
+  const [modalContent1, setModalContent1] = useState(null);
 
+  const allConversations = useSelector(
+    state => state.conversationReducer.allConversation,
+  );
   const selectedConversation = useSelector(
     state => state.conversationReducer.selectedConversation,
   );
+
   const dispatch = useDispatch();
   const handlePress = () => {
     const url = data.file;
@@ -49,6 +58,11 @@ export default function SendingContent({data}) {
     setModalVideoVisible(true);
   };
 
+  const showModalContent = data => {
+    setModalContent1(data);
+    setModalVisibleForward(true);
+  };
+
   const handleRemoveMessage = async () => {
     const userId = await getUserId();
     try {
@@ -60,6 +74,39 @@ export default function SendingContent({data}) {
         removeMessageSocket({
           ...data,
           receiverIds: selectedConversation.users
+            .filter(user => user._id !== userId)
+            .map(user => user._id),
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleForwardMessage = async conversation => {
+    const token = await getToken();
+    const userId = await getUserId();
+    const dt = {
+      message: data,
+      conversationForwardId: conversation._id,
+      // conversationForwardId: selectedConversation._id,
+    };
+
+    // console.log(dt);
+    try {
+      const result = await axios.post(
+        `${BASE_URL}/conversation/forwardMessage`,
+        dt,
+        {
+          headers: {
+            'auth-token': token,
+          },
+        },
+      );
+      if (result.status === 200) {
+        sendMessageSocket({
+          ...result.data,
+          receiverIds: conversation.users
             .filter(user => user._id !== userId)
             .map(user => user._id),
         });
@@ -137,6 +184,63 @@ export default function SendingContent({data}) {
         </View>
       </Modal>
 
+      <Modal
+        transparent={true}
+        visible={modalVisibleForward}
+        onRequestClose={() => {
+          setModalVisibleForward(false);
+        }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          }}>
+          <View
+            style={{
+              backgroundColor: '#C0C0C0',
+              height: 500,
+              width: 350,
+              borderRadius: 10,
+            }}
+            onPress={() => setModalVisibleForward(false)}>
+            <View>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}>
+                {allConversations?.map((item, index) => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleForwardMessage(item);
+                    }}>
+                    <CardChat1 key={index} data={item} />
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+            <TouchableOpacity onPress={() => setModalVisibleForward(false)}>
+              <View
+                style={{
+                  height: 35,
+                  width: 35,
+                  position: 'absolute',
+                  borderRadius: 25,
+                  backgroundColor: 'white',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 300,
+                  marginTop: -500,
+                }}>
+                <Text style={{fontSize: 30, color: 'black', marginTop: -5}}>
+                  x
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <Text
         style={{
           color: 'black',
@@ -165,9 +269,7 @@ export default function SendingContent({data}) {
           ))
         : null}
       {data.video ? (
-        <TouchableOpacity
-          onPress={()=>showVideo(data.video)}
-        >
+        <TouchableOpacity onPress={() => showVideo(data.video)}>
           <Video
             source={{uri: data.video}}
             style={{width: 200, height: 200}}
@@ -190,33 +292,43 @@ export default function SendingContent({data}) {
         </View>
       ) : null}
       {data.location ? (
-          <View >
-            <MapView
-              provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-              style={{ width: 250, height: 300, }}
-              showsUserLocation
-              region={{
+        <View>
+          <MapView
+            provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+            style={{width: 250, height: 300}}
+            showsUserLocation
+            region={{
+              latitude: data.location.latitude,
+              longitude: data.location.longitude,
+              latitudeDelta: 0.002,
+              longitudeDelta: 0.002,
+            }}>
+            <Marker
+              coordinate={{
                 latitude: data.location.latitude,
                 longitude: data.location.longitude,
-                latitudeDelta: 0.002,
-                longitudeDelta: 0.002,
-              }}
-            >
-              <Marker
-                coordinate={{ latitude: data.location.latitude, longitude: data.location.longitude }}
-              ></Marker>
-            </MapView>
-          </View>
-        ) : null}
+              }}></Marker>
+          </MapView>
+        </View>
+      ) : null}
       <Text style={{color: 'gray', alignSelf: 'flex-end', margin: 5}}>
         {moment(data.createdAt).format('HH:mm')}
       </Text>
 
+      {/* <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}> */}
       <View>
         <TouchableOpacity onPress={() => handleRemoveMessage()}>
           <Text style={{color: 'red', alignSelf: 'center'}}>Delete</Text>
         </TouchableOpacity>
       </View>
+
+      <View>
+        <TouchableOpacity onPress={() => showModalContent(data)}>
+          <Text style={{color: 'blue', alignSelf: 'center'}}>Forward</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* </View> */}
     </View>
   );
 }
