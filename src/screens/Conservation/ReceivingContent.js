@@ -11,10 +11,10 @@ import {removeMessageSocket} from '../../utils/socket';
 export default function ReceivingContent({data, sender}) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState(null);
-  const selectedConversation = useSelector(
-    state => state.conversationReducer.selectedConversation,
-  );
-  const dispatch = useDispatch();
+  // const selectedConversation = useSelector(
+  //   state => state.conversationReducer.selectedConversation,
+  // );
+  // const dispatch = useDispatch();
   const senderName = sender.name;
   const handlePress = () => {
     const url = data.file;
@@ -32,25 +32,25 @@ export default function ReceivingContent({data, sender}) {
     setModalVisible(true);
   };
 
-  const handleRemoveMessage = async () => {
-    const userId = await getUserId();
-    try {
-      const result = await axios.post(
-        `${BASE_URL}/conversation/removeMessage/${data._id}`,
-      );
-      if (result.status === 200) {
-        dispatch(getCurrentMessage(selectedConversation._id));
-        removeMessageSocket({
-          ...data,
-          receiverIds: selectedConversation.users
-            .filter(user => user._id !== userId)
-            .map(user => user._id),
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const handleRemoveMessage = async () => {
+  //   const userId = await getUserId();
+  //   try {
+  //     const result = await axios.post(
+  //       `${BASE_URL}/conversation/removeMessage/${data._id}`,
+  //     );
+  //     if (result.status === 200) {
+  //       dispatch(getCurrentMessage(selectedConversation._id));
+  //       removeMessageSocket({
+  //         ...data,
+  //         receiverIds: selectedConversation.users
+  //           .filter(user => user._id !== userId)
+  //           .map(user => user._id),
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   return (
     <View style={{flexDirection: 'row'}}>
@@ -165,11 +165,11 @@ export default function ReceivingContent({data, sender}) {
         <Text style={{margin: 5, color: 'gray'}}>
           {moment(data.createdAt).format('HH:mm')}
         </Text>
-        <View>
+        {/* <View>
           <TouchableOpacity onPress={() => handleRemoveMessage()}>
             <Text style={{color: 'red', alignSelf: 'center'}}>Delete</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     </View>
   );

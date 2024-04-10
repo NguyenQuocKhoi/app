@@ -1,6 +1,7 @@
 import moment from 'moment';
 import React, {useState} from 'react';
 import {
+  Dimensions,
   Image,
   Linking,
   Modal,
@@ -18,6 +19,10 @@ import {removeMessageSocket} from '../../utils/socket';
 export default function SendingContent({data}) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState(null);
+
+  const [modalVideoVisible, setModalVideoVisible] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+
   const selectedConversation = useSelector(
     state => state.conversationReducer.selectedConversation,
   );
@@ -26,6 +31,7 @@ export default function SendingContent({data}) {
     const url = data.file;
     Linking.openURL(url);
   };
+
   const showImage = imageUrl => {
     const imageContent = (
       <Image
@@ -35,6 +41,11 @@ export default function SendingContent({data}) {
     );
     setModalContent(imageContent);
     setModalVisible(true);
+  };
+
+  const showVideo = videoUri => {
+    setSelectedVideo(videoUri);
+    setModalVideoVisible(true);
   };
 
   const handleRemoveMessage = async () => {
@@ -101,6 +112,30 @@ export default function SendingContent({data}) {
         </View>
       </Modal>
 
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={modalVideoVisible}
+        onRequestClose={() => {
+          setModalVideoVisible(false);
+        }}>
+        <View style={{flex: 1}}>
+          <TouchableOpacity
+            style={{position: 'absolute', top: 20, right: 20, zIndex: 999}}
+            onPress={() => {
+              setModalVideoVisible(false);
+            }}>
+            <Text style={{fontSize: 30, color: 'black', marginTop: -5}}>x</Text>
+          </TouchableOpacity>
+          <Video
+            source={{uri: selectedVideo}}
+            style={{flex: 1, width: Dimensions.get('window').width}}
+            resizeMode="contain"
+            controls
+          />
+        </View>
+      </Modal>
+
       <Text
         style={{
           color: 'black',
@@ -129,14 +164,16 @@ export default function SendingContent({data}) {
           ))
         : null}
       {data.video ? (
-        // <View style={{alignItems:'center', justifyContent:'center', height: 200, width:600}}>
-        <Video
-          source={{uri: data.video}}
-          style={{width: 200, height: 200}}
-          controls={true}
-        />
-      ) : // </View>
-      null}
+        <TouchableOpacity
+          onPress={()=>showVideo(data.video)}
+        >
+          <Video
+            source={{uri: data.video}}
+            style={{width: 200, height: 200}}
+            controls={true}
+          />
+        </TouchableOpacity>
+      ) : null}
       {data.file ? (
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity onPress={() => handlePress()}>
@@ -157,7 +194,7 @@ export default function SendingContent({data}) {
 
       <View>
         <TouchableOpacity onPress={() => handleRemoveMessage()}>
-          <Text style={{color:'red', alignSelf:'center'}}>Delete</Text>
+          <Text style={{color: 'red', alignSelf: 'center'}}>Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
