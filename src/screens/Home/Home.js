@@ -38,7 +38,7 @@ import {
 } from '../../redux/conversationsSlice';
 import {getUserId, getToken} from '../../utils';
 import CardChat from '../Conservation/CardChat';
-import {handleSetCurrentMessage} from '../../redux/messageSlice';
+import {handleSetCurrentMessage, getCurrentMessage} from '../../redux/messageSlice';
 import {ScrollView} from 'react-native';
 import {ModalPicker} from '../../components/Modal/ModalPicker';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
@@ -72,9 +72,30 @@ function Home(props) {
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
+    console.log('socket', socket);
+    if (!socket) return;
+    socket.on('receiveMessage', res => {
+      dispatch(handleSetCurrentMessage(res));
+    });
+    socket.on('usersOnline', res => {
+      dispatch(handleGetUsersOnline(res));
+    });
+    socket.on('receiveNewConversation', res => {
+      console.log(res);
+      dispatch(handleNewConversation(res));
+    });
+    socket.on("receiveRemoveMessage", res =>{
+      dispatch(getCurrentMessage(res.conversationId));
+    })
     getConversations();
-  },[])
+    // getAllContacts();
+    return () => {
+      socket.off('receiveMessage');
+      socket.off('usersOnline');
+      socket.off('receiveNewConversation');
+    };
+  }, [socket]);
 
   const getConversations = async () => {
     try {

@@ -74,33 +74,33 @@ export default function Chat() {
   const [img, setImg] = useState([]);
   // console.log(img);
 
-  useEffect(() => {
-    getInitiateSocket();
-  }, []);
+  // useEffect(() => {
+  //   getInitiateSocket();
+  //   getConversations();
+  // }, []);
 
-  useEffect(() => {
-    if (socket === null) return;
-    // console.log(socket);
-    socket.on('receiveMessage', res => {
-      dispatch(handleSetCurrentMessage(res));
-    });
-    socket.on('usersOnline', res => {
-      dispatch(handleGetUsersOnline(res));
-    });
-    socket.on('receiveNewConversation', res => {
-      dispatch(handleNewConversation(res));
-    });
-    socket.on("receiveRemoveMessage", res =>{
-      dispatch(getCurrentMessage(res.conversationId));
-    })
-    getConversations();
-    // getAllContacts();
-    return () => {
-      socket.off('receiveMessage');
-      socket.off('usersOnline');
-      socket.off('receiveNewConversation');
-    };
-  }, [socket]);
+  // useEffect(() => {
+  //   if (socket === null) return;
+  //   socket.on('receiveMessage', res => {
+  //     dispatch(handleSetCurrentMessage(res));
+  //   });
+  //   socket.on('usersOnline', res => {
+  //     dispatch(handleGetUsersOnline(res));
+  //   });
+  //   socket.on('receiveNewConversation', res => {
+  //     dispatch(handleNewConversation(res));
+  //   });
+  //   socket.on("receiveRemoveMessage", res =>{
+  //     dispatch(getCurrentMessage(res.conversationId));
+  //   })
+  //   getConversations();
+  //   // getAllContacts();
+  //   return () => {
+  //     socket.off('receiveMessage');
+  //     socket.off('usersOnline');
+  //     socket.off('receiveNewConversation');
+  //   };
+  // }, [socket]);
 
   const getInitiateSocket = async () => {
     const userId = await getUserId();
