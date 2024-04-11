@@ -44,8 +44,9 @@ import {
 import {
   launchCamera,
   launchImageLibrary,
-  ImagePicker,
+  // ImagePicker,
 } from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 import {Image} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import {handleGetUsersOnline} from '../../redux/userSlice';
@@ -187,71 +188,203 @@ export default function Chat() {
     }
   };
 
-  const handlSendImagesLibrary = async () => {
-    try {
-      const userId = await getUserId();
-      const token = await getToken();
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-      );
+  //3
+const handlSendImagesLibrary = async () => {
+  try {
+    const userId = await getUserId();
+    const token = await getToken();
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+    );
 
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        const result = await launchImageLibrary({
-          mediaType: 'photo',
-          cameraType: 'back',
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      const images = await ImagePicker.openPicker({
+        multiple: true,
+        mediaType: 'photo',
+        includeBase64: true, // Nếu bạn muốn gửi base64
+      });
+      
+      if (images && images.length > 0) {
+        const formData = new FormData();
+        images.forEach((image, index) => {
+          formData.append('files', {
+            uri: image.path,
+            type: image.mime,
+            name: `image_${index}.jpg`,
+          });
         });
-        console.log(result);
-        if (!result.cancelled) {
-          var list = [];
-          for (let i = 0; i < result.assets.length; i++) {
-            const url = result.assets[i].uri;
-            list.push(url);
-          }
-          const formData = new FormData();
-          for (let i = 0; i < result.assets.length; i++) {
-            formData.append('files', {
-              uri: result.assets[i].uri,
-              type: 'image/jpeg',
-              name: 'avatar.jpg',
-            });
-          }
-          formData.append('conversationId', selectedConversation._id);
-          formData.append('user', userId);
-          try {
-            const result = await axios.post(
-              `${BASE_URL}/conversation/sendImages`,
-              formData,
-              {
-                headers: {
-                  'Content-Type': 'multipart/form-data',
-                  'auth-token': token,
-                },
+        
+        formData.append('conversationId', selectedConversation._id);
+        formData.append('user', userId);
+
+        try {
+          const result = await axios.post(
+            `${BASE_URL}/conversation/sendImages`,
+            formData,
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+                'auth-token': token,
               },
-            );
+            },
+          );
 
-            if (result.status === 200) {
-              sendMessageSocket({
-                ...result.data,
-                receiverIds: selectedConversation.users
-                  .filter(user => user._id !== userId)
-                  .map(user => user._id),
-              });
+          if (result.status === 200) {
+            sendMessageSocket({
+              ...result.data,
+              receiverIds: selectedConversation.users
+                .filter(user => user._id !== userId)
+                .map(user => user._id),
+            });
 
-              await dispatch(getCurrentMessage(selectedConversation._id));
-            }
-          } catch (error) {
-            console.log(error);
+            await dispatch(getCurrentMessage(selectedConversation._id));
           }
-        } else {
-          console.log('User cancelled the camera');
+        } catch (error) {
+          console.log(error);
         }
       } else {
-        console.log('Camera permission denied');
+        console.log('User cancelled the image picker');
       }
-    } catch (error) {
-      console.log('Error requesting camera permission:', error);
+    } else {
+      console.log('Camera permission denied');
     }
-  };
+  } catch (error) {
+    console.log('Error requesting camera permission:', error);
+  }
+};
+
+
+  //2
+  // const handlSendImagesLibrary = async () => {
+  //   try {
+  //     const userId = await getUserId();
+  //     const token = await getToken();
+  //     const granted = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.CAMERA,
+  //     );
+  
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       const result = await launchImageLibrary({
+  //         mediaType: 'photo',
+  //         cameraType: 'back',
+  //         multiple: true, // Cho phép chọn nhiều ảnh
+  //       });
+  //       console.log(result);
+  //       if (!result.cancelled) {
+  //         const formData = new FormData();
+  //         result.assets.forEach((asset, index) => {
+  //           formData.append('files', {
+  //             uri: asset.uri,
+  //             type: 'image/jpeg',
+  //             name: `image_${index}.jpg`, // Tạo tên duy nhất cho mỗi ảnh
+  //           });
+  //         });
+  //         formData.append('conversationId', selectedConversation._id);
+  //         formData.append('user', userId);
+  //         try {
+  //           const result = await axios.post(
+  //             `${BASE_URL}/conversation/sendImages`,
+  //             formData,
+  //             {
+  //               headers: {
+  //                 'Content-Type': 'multipart/form-data',
+  //                 'auth-token': token,
+  //               },
+  //             },
+  //           );
+  
+  //           if (result.status === 200) {
+  //             sendMessageSocket({
+  //               ...result.data,
+  //               receiverIds: selectedConversation.users
+  //                 .filter(user => user._id !== userId)
+  //                 .map(user => user._id),
+  //             });
+  
+  //             await dispatch(getCurrentMessage(selectedConversation._id));
+  //           }
+  //         } catch (error) {
+  //           console.log(error);
+  //         }
+  //       } else {
+  //         console.log('User cancelled the camera');
+  //       }
+  //     } else {
+  //       console.log('Camera permission denied');
+  //     }
+  //   } catch (error) {
+  //     console.log('Error requesting camera permission:', error);
+  //   }
+  // };
+  
+
+  //1
+  // const handlSendImagesLibrary = async () => {
+  //   try {
+  //     const userId = await getUserId();
+  //     const token = await getToken();
+  //     const granted = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.CAMERA,
+  //     );
+
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       const result = await launchImageLibrary({
+  //         mediaType: 'photo',
+  //         cameraType: 'back',
+  //         multiple: true,//
+  //       });
+  //       console.log(result);
+  //       if (!result.cancelled) {
+  //         var list = [];
+  //         for (let i = 0; i < result.assets.length; i++) {
+  //           const url = result.assets[i].uri;
+  //           list.push(url);
+  //         }
+  //         const formData = new FormData();
+  //         for (let i = 0; i < result.assets.length; i++) {
+  //           formData.append('files', {
+  //             uri: result.assets[i].uri,
+  //             type: 'image/jpeg',
+  //             name: 'avatar.jpg',
+  //           });
+  //         }
+  //         formData.append('conversationId', selectedConversation._id);
+  //         formData.append('user', userId);
+  //         try {
+  //           const result = await axios.post(
+  //             `${BASE_URL}/conversation/sendImages`,
+  //             formData,
+  //             {
+  //               headers: {
+  //                 'Content-Type': 'multipart/form-data',
+  //                 'auth-token': token,
+  //               },
+  //             },
+  //           );
+
+  //           if (result.status === 200) {
+  //             sendMessageSocket({
+  //               ...result.data,
+  //               receiverIds: selectedConversation.users
+  //                 .filter(user => user._id !== userId)
+  //                 .map(user => user._id),
+  //             });
+
+  //             await dispatch(getCurrentMessage(selectedConversation._id));
+  //           }
+  //         } catch (error) {
+  //           console.log(error);
+  //         }
+  //       } else {
+  //         console.log('User cancelled the camera');
+  //       }
+  //     } else {
+  //       console.log('Camera permission denied');
+  //     }
+  //   } catch (error) {
+  //     console.log('Error requesting camera permission:', error);
+  //   }
+  // };
 
   const handleLocation = async () => {
     try {
