@@ -1,6 +1,6 @@
 import moment from 'moment';
 import {useEffect, useState} from 'react';
-import {Image, Linking, Modal, ScrollView, TouchableOpacity, View} from 'react-native';
+import {Dimensions, Image, Linking, Modal, ScrollView, TouchableOpacity, View} from 'react-native';
 import {Text} from 'react-native-animatable';
 import Video from 'react-native-video';
 import axios from 'axios';
@@ -14,6 +14,9 @@ import CardChat1 from './CardConversation';
 export default function ReceivingContent({data, sender}) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState(null);
+
+  const [modalVideoVisible, setModalVideoVisible] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
   const [modalVisibleForward, setModalVisibleForward] = useState(false);
   const [modalContent1, setModalContent1] = useState(null);
@@ -43,6 +46,11 @@ export default function ReceivingContent({data, sender}) {
     );
     setModalContent(imageContent);
     setModalVisible(true);
+  };
+
+  const showVideo = videoUri => {
+    setSelectedVideo(videoUri);
+    setModalVideoVisible(true);
   };
 
   const handleForwardMessage = async conversation => {
@@ -89,7 +97,16 @@ export default function ReceivingContent({data, sender}) {
           style={{flex: 1, backgroundColor: '#C0C0C0'}}
           onPress={() => setModalVisible(false)}>
           <View style={{flexDirection: 'row'}}>
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
+          <TouchableOpacity
+              style={{position: 'absolute', top: 20, right: 20, zIndex: 999}}
+              onPress={() => {
+                setModalVisible(false);
+              }}>
+              <Text style={{fontSize: 30, color: 'black', marginTop: -5}}>
+                x
+              </Text>
+            </TouchableOpacity>
+            {/* <TouchableOpacity onPress={() => setModalVisible(false)}>
               <View
                 style={{
                   height: 35,
@@ -106,7 +123,7 @@ export default function ReceivingContent({data, sender}) {
                   x
                 </Text>
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <Text
               style={{
                 color: 'black',
@@ -121,6 +138,30 @@ export default function ReceivingContent({data, sender}) {
           <View style={{justifyContent: 'center', height: 200, marginTop: 250}}>
             {modalContent}
           </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={modalVideoVisible}
+        onRequestClose={() => {
+          setModalVideoVisible(false);
+        }}>
+        <View style={{flex: 1}}>
+          <TouchableOpacity
+            style={{position: 'absolute', top: 20, right: 20, zIndex: 999}}
+            onPress={() => {
+              setModalVideoVisible(false);
+            }}>
+            <Text style={{fontSize: 30, color: 'black', marginTop: -5}}>x</Text>
+          </TouchableOpacity>
+          <Video
+            source={{uri: selectedVideo}}
+            style={{flex: 1, width: Dimensions.get('window').width}}
+            resizeMode="contain"
+            controls
+          />
         </View>
       </Modal>
 
@@ -159,7 +200,16 @@ export default function ReceivingContent({data, sender}) {
                 ))}
               </ScrollView>
             </View>
-            <TouchableOpacity onPress={() => setModalVisibleForward(false)}>
+            <TouchableOpacity
+              style={{position: 'absolute', top: 20, right: 20, zIndex: 999}}
+              onPress={() => {
+                setModalVisibleForward(false);
+              }}>
+              <Text style={{fontSize: 30, color: 'black', marginTop: -5}}>
+                x
+              </Text>
+            </TouchableOpacity>
+            {/* <TouchableOpacity onPress={() => setModalVisibleForward(false)}>
               <View
                 style={{
                   height: 35,
@@ -176,7 +226,7 @@ export default function ReceivingContent({data, sender}) {
                   x
                 </Text>
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </Modal>
@@ -239,12 +289,14 @@ export default function ReceivingContent({data, sender}) {
           </View>
         ) : null}
         {data.video ? (
+        <TouchableOpacity onPress={() => showVideo(data.video)}>
           <Video
             source={{uri: data.video}}
             style={{width: 200, height: 200}}
             // controls={true}
           />
-        ) : null}
+        </TouchableOpacity>
+      ) : null}
         {data.location ? (
           <View>
             <MapView

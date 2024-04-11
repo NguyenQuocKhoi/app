@@ -135,8 +135,16 @@ export default function SendingContent({data}) {
         }}>
         <View
           style={{flex: 1, backgroundColor: '#C0C0C0'}}
-          onPress={() => setModalVisible(false)}>
-          <TouchableOpacity onPress={() => setModalVisible(false)}>
+          // onPress={() => setModalVisible(false)}
+        >
+          <TouchableOpacity
+            style={{position: 'absolute', top: 20, right: 20, zIndex: 999}}
+            onPress={() => {
+              setModalVisible(false);
+            }}>
+            <Text style={{fontSize: 30, color: 'black', marginTop: -5}}>x</Text>
+          </TouchableOpacity>
+          {/* <TouchableOpacity onPress={() => setModalVisible(false)}>
             <View
               style={{
                 height: 35,
@@ -153,7 +161,7 @@ export default function SendingContent({data}) {
                 x
               </Text>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <View style={{justifyContent: 'center', height: 200, marginTop: 250}}>
             {modalContent}
           </View>
@@ -205,7 +213,7 @@ export default function SendingContent({data}) {
               borderRadius: 10,
             }}
             // onPress={() => setModalVisibleForward(false)}
-            >
+          >
             <View>
               <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -220,7 +228,16 @@ export default function SendingContent({data}) {
                 ))}
               </ScrollView>
             </View>
-            <TouchableOpacity onPress={() => setModalVisibleForward(false)}>
+            <TouchableOpacity
+              style={{position: 'absolute', top: 20, right: 20, zIndex: 999}}
+              onPress={() => {
+                setModalVisibleForward(false);
+              }}>
+              <Text style={{fontSize: 30, color: 'black', marginTop: -5}}>
+                x
+              </Text>
+            </TouchableOpacity>
+            {/* <TouchableOpacity onPress={() => setModalVisibleForward(false)}>
               <View
                 style={{
                   height: 35,
@@ -237,7 +254,7 @@ export default function SendingContent({data}) {
                   x
                 </Text>
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </Modal>
