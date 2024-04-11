@@ -93,8 +93,9 @@ export const CrossImg = styled.Image`
 
 export const MicrophoneImg = styled.Image`
   margin-right: 10px;
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
+  tintColor: gray;
 `;
 
 export const MoreImg = styled.Image`

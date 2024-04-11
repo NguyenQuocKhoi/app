@@ -33,20 +33,20 @@ const Login = props => {
   const [eyeClick, setEyeClick] = useState(true);
   const [notification, setNotification] = useState('');
 
-  useEffect(() => {
-    getData();
-  }, []);
-  const getData = () => {
-    try {
-      AsyncStorage.getItem('user').then(value => {
-        if (value != null) {
-          props.navigation.navigate('HomeScreenNav');
-        }
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // useEffect(() => {
+  //   getData();
+  // }, []);
+  // const getData = () => {
+  //   try {
+  //     AsyncStorage.getItem('user').then(value => {
+  //       if (value != null) {
+  //         props.navigation.navigate('HomeScreenNav');
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const handleLogin = async () => {
     if (checkPhoneValid(phone)) {
@@ -144,7 +144,7 @@ const Login = props => {
                   onPress={() => {
                     setEyeClick(!eyeClick);
                   }}>
-                  <Text style={{color: '#3399FF'}}>View</Text>
+                  <Text style={{color: '#3399FF', marginLeft: -40}}>View</Text>
                 </TouchableOpacity>
               </View>
 

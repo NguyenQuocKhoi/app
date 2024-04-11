@@ -74,10 +74,10 @@ export default function Chat() {
   const [img, setImg] = useState([]);
   // console.log(img);
 
-  // useEffect(() => {
-  //   getInitiateSocket();
-  //   getConversations();
-  // }, []);
+  useEffect(() => {
+    getInit();
+    // getConversations();
+  }, []);
 
   // useEffect(() => {
   //   if (socket === null) return;
@@ -102,10 +102,10 @@ export default function Chat() {
   //   };
   // }, [socket]);
 
-  const getInitiateSocket = async () => {
+  const getInit = async () => {
     const userId = await getUserId();
     if (userId) {
-      initiateSocket(userId);
+      // initiateSocket(userId);
       setId(userId);
       // console.log(1);
     }
@@ -173,6 +173,7 @@ export default function Chat() {
               await dispatch(getCurrentMessage(selectedConversation._id));
             }
           } catch (error) {
+            console.log(1);
             console.log(error);
           }
         } else {
@@ -185,17 +186,82 @@ export default function Chat() {
       console.log('Error requesting camera permission:', error);
     }
   };
-  const handleLocation = async () => {
-  
+
+  const handlSendImagesLibrary = async () => {
     try {
-     
+      const userId = await getUserId();
+      const token = await getToken();
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+      );
+
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        const result = await launchImageLibrary({
+          mediaType: 'photo',
+          cameraType: 'back',
+        });
+        console.log(result);
+        if (!result.cancelled) {
+          var list = [];
+          for (let i = 0; i < result.assets.length; i++) {
+            const url = result.assets[i].uri;
+            list.push(url);
+          }
+          const formData = new FormData();
+          for (let i = 0; i < result.assets.length; i++) {
+            formData.append('files', {
+              uri: result.assets[i].uri,
+              type: 'image/jpeg',
+              name: 'avatar.jpg',
+            });
+          }
+          formData.append('conversationId', selectedConversation._id);
+          formData.append('user', userId);
+          try {
+            const result = await axios.post(
+              `${BASE_URL}/conversation/sendImages`,
+              formData,
+              {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                  'auth-token': token,
+                },
+              },
+            );
+
+            if (result.status === 200) {
+              sendMessageSocket({
+                ...result.data,
+                receiverIds: selectedConversation.users
+                  .filter(user => user._id !== userId)
+                  .map(user => user._id),
+              });
+
+              await dispatch(getCurrentMessage(selectedConversation._id));
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        } else {
+          console.log('User cancelled the camera');
+        }
+      } else {
+        console.log('Camera permission denied');
+      }
+    } catch (error) {
+      console.log('Error requesting camera permission:', error);
+    }
+  };
+
+  const handleLocation = async () => {
+    try {
       const userID = await getUserId();
       const token = await getToken();
       const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        const success = async (pos) => {
+        const success = async pos => {
           var crd = pos.coords;
           const location = {
             latitude: crd.latitude,
@@ -208,41 +274,40 @@ export default function Chat() {
           };
           try {
             console.log(data);
-              const result = await axios.post(
-                `${BASE_URL}/conversation/sendLocation`,
-                data,
-                {
-                  headers: {
-                    'auth-token': token,
-                  },
+            const result = await axios.post(
+              `${BASE_URL}/conversation/sendLocation`,
+              data,
+              {
+                headers: {
+                  'auth-token': token,
                 },
-              );
-              if (result.status === 200) {
-                sendMessageSocket({
-                  ...result.data,
-                  receiverIds: selectedConversation.users
-                    .filter(user => user._id !== userId)
-                    .map(user => user._id),
-                });
-                await dispatch(getCurrentMessage(selectedConversation._id));
-              }
-            } catch (error) {
-              console.log(error);
+              },
+            );
+            if (result.status === 200) {
+              sendMessageSocket({
+                ...result.data,
+                receiverIds: selectedConversation.users
+                  .filter(user => user._id !== userId)
+                  .map(user => user._id),
+              });
+              await dispatch(getCurrentMessage(selectedConversation._id));
             }
-           console.log(location);
-        }
-           Geolocation.getCurrentPosition(success);
+          } catch (error) {
+            console.log(error);
+          }
+          console.log(location);
+        };
+        Geolocation.getCurrentPosition(success);
       } else if (granted === PermissionsAndroid.RESULTS.DENIED) {
-          Alert.alert("You have denied to grant location permission");
-      }
-      else {
+        Alert.alert('You have denied to grant location permission');
+      } else {
         console.log('Ứng dụng không hỗ trợ viêc cấp quyền');
       }
     } catch (error) {
       console.log(2);
       console.log(error);
     }
-  }
+  };
   const uploadVideo = async () => {
     try {
       const userId = await getUserId();
@@ -264,7 +329,7 @@ export default function Chat() {
       }
       formData.append('conversationId', selectedConversation._id);
       formData.append('user', userId);
-  
+
       try {
         const result = await axios.post(
           `${BASE_URL}/conversation/sendVideo`,
@@ -390,7 +455,7 @@ export default function Chat() {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current?.scrollToEnd({ animated: true });
+      scrollRef.current?.scrollToEnd({animated: true});
     }
   }, [currentMessage, selectedConversation]);
 
@@ -504,16 +569,19 @@ export default function Chat() {
             <MoreImg
               source={require('../../images/icons8-more-48.png')}></MoreImg>
           </TouchableOpacity>
-          <TouchableOpacity>
-            <MicrophoneImg
-              source={require('../../images/icons8-microphone-48.png')}></MicrophoneImg>
-          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              handlSendImages();
+              handlSendImagesLibrary();
             }}>
             <ImageImg
               source={require('../../images/icons8-image-48.png')}></ImageImg>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              handlSendImages();//chụp được gửi không được
+            }}>
+            <MicrophoneImg
+              source={require('../../images/icons8-camera-30.png')}></MicrophoneImg>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleSendMessage()}>
             <SendImg

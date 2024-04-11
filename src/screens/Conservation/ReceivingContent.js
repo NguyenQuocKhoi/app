@@ -242,7 +242,7 @@ export default function ReceivingContent({data, sender}) {
           <Video
             source={{uri: data.video}}
             style={{width: 200, height: 200}}
-            controls={true}
+            // controls={true}
           />
         ) : null}
         {data.location ? (
@@ -270,7 +270,7 @@ export default function ReceivingContent({data, sender}) {
         </Text>
         <View>
         <TouchableOpacity onPress={() => showModalContent(data)}>
-          <Text style={{color: 'blue', alignSelf: 'center'}}>Forward</Text>
+          <Text style={{color: 'blue', alignSelf: 'center'}}>Share</Text>
         </TouchableOpacity>
       </View>
       </View>

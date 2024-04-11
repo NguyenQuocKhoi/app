@@ -9,6 +9,7 @@ import {
   TextInput,
   Modal,
   Button,
+  Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -35,20 +36,25 @@ import {
   getAllConversations,
   handleNewConversation,
   selectConversation,
+  selectedConversation,
 } from '../../redux/conversationsSlice';
 import {getUserId, getToken} from '../../utils';
 import CardChat from '../Conservation/CardChat';
-import {handleSetCurrentMessage, getCurrentMessage} from '../../redux/messageSlice';
+import {
+  handleSetCurrentMessage,
+  getCurrentMessage,
+} from '../../redux/messageSlice';
 import {ScrollView} from 'react-native';
 import {ModalPicker} from '../../components/Modal/ModalPicker';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 function Home(props) {
-  const [userData, setUserData] = React.useState('');
-
   const [modalVisible, setModalVisible] = useState(false);
   // const [notiAddMember, setNotiAddMember] = useState('');
   const allConversations = useSelector(
     state => state.conversationReducer.allConversation,
+  );
+  const selectedConversation = useSelector(
+    state => state.conversationReducer.selectedConversation,
   );
   const dispatch = useDispatch();
   const onPressItem = option => {
@@ -85,9 +91,9 @@ function Home(props) {
       console.log(res);
       dispatch(handleNewConversation(res));
     });
-    socket.on("receiveRemoveMessage", res =>{
+    socket.on('receiveRemoveMessage', res => {
       dispatch(getCurrentMessage(res.conversationId));
-    })
+    });
     getConversations();
     // getAllContacts();
     return () => {
@@ -105,7 +111,6 @@ function Home(props) {
       console.log(error);
     }
   };
-
 
   return (
     <View style={{marginBottom: 50}}>
@@ -186,15 +191,24 @@ function Home(props) {
             source={require('../../images/icons8-plus-24.png')}></PlusImg>
         </TouchableOpacity>
       </Header>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}>
-        {allConversations?.map((item, index) => (
-          <CardChat key={index} data={item} />
-        ))}
-      </ScrollView>
-
-      <View>{/* <Chat/> */}</View>
+      {allConversations !== null && allConversations.length > 0 ? (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}>
+          {allConversations?.map((item, index) => (
+            <CardChat key={index} data={item} />
+          ))}
+        </ScrollView>
+      ) : (
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <View style={{marginTop: 200}}>
+            <Text style={{fontSize: 50, color: '#3399ff', fontWeight: 'bold', alignSelf: 'center'}}>Chat App</Text>
+            <Text style={{fontSize: 30, color: '#3399ff'}}>
+              Make friends to text
+            </Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 }

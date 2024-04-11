@@ -146,7 +146,7 @@ export default function SendingContent({data}) {
                 backgroundColor: 'white',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginLeft: 350,
+                marginLeft: 330,
                 marginTop: 40,
               }}>
               <Text style={{fontSize: 30, color: 'black', marginTop: -5}}>
@@ -204,7 +204,8 @@ export default function SendingContent({data}) {
               width: 350,
               borderRadius: 10,
             }}
-            onPress={() => setModalVisibleForward(false)}>
+            // onPress={() => setModalVisibleForward(false)}
+            >
             <View>
               <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -273,7 +274,7 @@ export default function SendingContent({data}) {
           <Video
             source={{uri: data.video}}
             style={{width: 200, height: 200}}
-            controls={true}
+            // controls={true}
           />
         </TouchableOpacity>
       ) : null}
@@ -324,7 +325,7 @@ export default function SendingContent({data}) {
 
       <View>
         <TouchableOpacity onPress={() => showModalContent(data)}>
-          <Text style={{color: 'blue', alignSelf: 'center'}}>Forward</Text>
+          <Text style={{color: 'blue', alignSelf: 'center'}}>Share</Text>
         </TouchableOpacity>
       </View>
 
