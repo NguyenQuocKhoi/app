@@ -1,9 +1,22 @@
 import {useState} from 'react';
-import {Alert, Modal, Text, TextInput, TouchableOpacity} from 'react-native';
+import {
+  Alert,
+  Modal,
+  PermissionsAndroid,
+  Text,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
 import {Image, View} from 'react-native-animatable';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {AddFriendImg1, BackImg, CrossImg, HeaderAddMember} from './styles';
+import {
+  AddFriendImg1,
+  BackImg,
+  CrossImg,
+  HeaderAddMember,
+  IconCamera,
+} from './styles';
 import {useNavigation} from '@react-navigation/native';
 import {BASE_URL, getToken, getUserId} from '../../utils';
 import axios from 'axios';
@@ -11,7 +24,9 @@ import {
   getAllConversations,
   selectConversation,
 } from '../../redux/conversationsSlice';
-import { updateGroup } from '../../utils/socket';
+import {updateGroup} from '../../utils/socket';
+import {launchCamera} from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 
 export default function ChatInfo1() {
   const navigation = useNavigation();
@@ -53,22 +68,82 @@ export default function ChatInfo1() {
       );
       console.log(result.data);
       if (result.status === 200) {
-       await dispatch(selectConversation(result.data));
-       await dispatch(getAllConversations(userId));
-       updateGroup(
-        result.data,
-        result.data.users
-          .filter((user) => user._id !== userId)
-          .map((user) => user._id)
-      );
-      Alert.alert("Success");
+        await dispatch(selectConversation(result.data));
+        await dispatch(getAllConversations(userId));
+        updateGroup(
+          result.data,
+          result.data.users
+            .filter(user => user._id !== userId)
+            .map(user => user._id),
+        );
+        Alert.alert('Success');
       }
     } catch (error) {
       console.log(error);
       Alert.alert('Fail');
     }
   };
- 
+
+  const handleChangeGroupImage = async () => {
+    try {
+      const userId = await getUserId();
+      const token = await getToken();
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+      );
+
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        const images = await ImagePicker.openPicker({
+          multiple: true,
+          mediaType: 'photo',
+          includeBase64: true, // Nếu bạn muốn gửi base64
+        });
+
+        if (images && images.length > 0) {
+          const formData = new FormData();
+          images.forEach((image, index) => {
+            formData.append('file', {
+              uri: image.path,
+              type: image.mime,
+              name: `image_${index}.jpg`,
+            });
+          });
+
+          try {
+            const result = await axios.put(
+              `${BASE_URL}/conversation/changeGroupImage/${selectedConversation._id}`,
+              formData,
+              {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                  'auth-token': token,
+                },
+              },
+            );
+            if (result.status === 200) {
+              await dispatch(selectConversation(result.data));
+              await dispatch(getAllConversations(userId));
+              updateGroup(
+                result.data,
+                result.data.users
+                  .filter(user => user._id !== userId)
+                  .map(user => user._id),
+              );
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        } else {
+          console.log('User cancelled the image picker');
+        }
+      } else {
+        console.log('Camera permission denied');
+      }
+    } catch (error) {
+      console.log('Error requesting camera permission:', error);
+    }
+  };
+
   return (
     <View>
       <HeaderAddMember>
@@ -103,12 +178,19 @@ export default function ChatInfo1() {
             }}
             src={
               selectedConversation.isGroup
-                ? 'https://static.vecteezy.com/system/resources/previews/010/154/511/non_2x/people-icon-sign-symbol-design-free-png.png'
+                ? selectedConversation.image || 'https://static.vecteezy.com/system/resources/previews/010/154/511/non_2x/people-icon-sign-symbol-design-free-png.png'
                 : 'https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png'
             }
           />
+          <TouchableOpacity
+            // onPress={()=>requestCameraPermission()}
+            onPress={() => handleChangeGroupImage()}>
+            <IconCamera
+              source={require('../../images/icons8-camera-30.png')}></IconCamera>
+          </TouchableOpacity>
         </View>
       </View>
+
       <View
         style={{
           alignItems: 'center',

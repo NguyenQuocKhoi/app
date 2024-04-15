@@ -121,4 +121,10 @@ export const TextOnline = styled.Text`
   color: white;
 `;
 
-
+export const IconCamera = styled.Image`
+  height: 30px;
+  width: 30px;
+  margin-top: -20px;
+  margin-left: 15px;
+  position: absolute;
+`;

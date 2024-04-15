@@ -19,7 +19,7 @@ export const ChangePasswordBtn = styled.Text`
   text-align: center;
   color: blue;
   font-size: 16px;
-`
+`;
 
 export const TextInput = styled.TextInput`
   font-size: 20px;
@@ -29,20 +29,20 @@ export const TextInput = styled.TextInput`
 export const TextUserInfor = styled.View`
   flex-direction: column;
   border-bottom-width: 1px;
-  border-bottom-color: black; 
+  border-bottom-color: black;
   width: 280px;
 `;
 
 export const ViewUserInfor = styled.View`
-margin-left: 15px;
-margin-right: 15px;
+  margin-left: 15px;
+  margin-right: 15px;
 `;
 
 export const ViewRadioBtn = styled.View`
-flex-direction: row;
-justify-content: center;
-margin: 10px;
-margin-top: 20px;
+  flex-direction: row;
+  justify-content: center;
+  margin: 10px;
+  margin-top: 20px;
 `;
 
 export const RadioBtn = styled.View`
@@ -51,27 +51,24 @@ export const RadioBtn = styled.View`
 `;
 
 export const IconInfor = styled.Image`
-height: 30px; 
-width: 30px;
-margin-top: 30px;
-
+  height: 30px;
+  width: 30px;
+  margin-top: 30px;
 `;
 
 export const IconCamera = styled.Image`
-height: 30px; 
-width: 30px;
-margin-top: 80px;
-margin-left: -30px;
-
-position: absolute;
+  height: 30px;
+  width: 30px;
+  margin-top: 80px;
+  margin-left: -30px;
+  position: absolute;
 `;
 
-
 export const IconPhone = styled.Image`
-height: 30px; 
-width: 30px;
-margin-top: 30px;
-tintColor: gray
+  height: 30px;
+  width: 30px;
+  margin-top: 30px;
+  tintcolor: gray;
 `;
 
 export const TextBtnUpdate = styled.Text`
@@ -94,5 +91,5 @@ export const BtnUpdate = styled.View`
     height: 2px;
   }
   shadowopacity: 0.17;
-  margin-top:20px;
+  margin-top: 20px;
 `;
