@@ -5,7 +5,7 @@ let socket;
 
 const initiateSocket = userId => {
   socket = io(BASE_URL, {
-    path: "",
+    path: '',
     transports: ['websocket'],
     query: {userId},
   });
@@ -23,9 +23,9 @@ const sendMessageSocket = message => {
   }
 };
 
-const removeMessageSocket = (receiverId) => {
+const removeMessageSocket = receiverId => {
   if (socket) {
-    socket.emit("removeMessage", receiverId);
+    socket.emit('removeMessage', receiverId);
   }
 };
 
@@ -35,7 +35,17 @@ const disconnectSocket = () => {
   }
 };
 
+const updateGroup = (conversation, receiverId) => {
+  if (socket) {
+    socket.emit('updateGroup', conversation, receiverId);
+  }
+};
 
+const newGroup = (conversation, receiverId) => {
+  if (socket) {
+    socket.emit('newGroup', conversation, receiverId);
+  }
+};
 
 export {
   socket,
@@ -44,4 +54,6 @@ export {
   initiateSocket,
   newConversationSocket,
   removeMessageSocket,
+  newGroup,
+  updateGroup,
 };

@@ -1,15 +1,9 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {Alert, Modal, Text, TextInput, TouchableOpacity} from 'react-native';
 import {Image, View} from 'react-native-animatable';
-import CardAddMembers from '../Group/CardAddMembers';
+
 import {useDispatch, useSelector} from 'react-redux';
-import {
-  AddFriendImg1,
-  BackImg,
-  CrossImg,
-  HeaderAddMember,
-  LeaveGroupImg,
-} from './styles';
+import {AddFriendImg1, BackImg, CrossImg, HeaderAddMember} from './styles';
 import {useNavigation} from '@react-navigation/native';
 import {BASE_URL, getToken, getUserId} from '../../utils';
 import axios from 'axios';
@@ -17,12 +11,11 @@ import {
   getAllConversations,
   selectConversation,
 } from '../../redux/conversationsSlice';
+import { updateGroup } from '../../utils/socket';
 
 export default function ChatInfo1() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
-  const [members, setMembers] = useState([]);
-  const [openAddMembers, setOpenAddMembers] = useState(false);
 
   const selectedConversation = useSelector(
     state => state.conversationReducer.selectedConversation,
@@ -39,8 +32,8 @@ export default function ChatInfo1() {
 
   const groupName = getGroupName();
   const [inputNameGroup, setInputNameGroup] = useState(groupName);
-  // console.log(inputNameGroup);
   const dispatch = useDispatch();
+
   const handleChangeGroupName = async () => {
     try {
       const dt = {
@@ -58,29 +51,24 @@ export default function ChatInfo1() {
           },
         },
       );
-
+      console.log(result.data);
       if (result.status === 200) {
-        const result1 = await axios.get(
-          `${BASE_URL}/conversation/${selectedConversation._id}`,
-          {
-            headers: {
-              'auth-token': `${token}`,
-            },
-          },
-        );
-        if (result1.status === 200) {
-          await dispatch(selectConversation(result1.data));
-          await dispatch(getAllConversations(userId));
-          // props.onHide();
-          Alert.alert('Success');
-        }
+       await dispatch(selectConversation(result.data));
+       await dispatch(getAllConversations(userId));
+       updateGroup(
+        result.data,
+        result.data.users
+          .filter((user) => user._id !== userId)
+          .map((user) => user._id)
+      );
+      Alert.alert("Success");
       }
     } catch (error) {
       console.log(error);
       Alert.alert('Fail');
     }
   };
-  // console.log(groupName);
+ 
   return (
     <View>
       <HeaderAddMember>
@@ -195,13 +183,13 @@ export default function ChatInfo1() {
               }}>
               Change group name
             </Text>
-            <View style={{ borderTopWidth: 0.5,marginTop:10}}>
+            <View style={{borderTopWidth: 0.5, marginTop: 10}}>
               <TextInput
                 style={{
                   fontSize: 15,
                   color: 'black',
-                 
-                    marginLeft:10,
+
+                  marginLeft: 10,
                   width: '100%',
                 }}
                 value={inputNameGroup}
@@ -213,25 +201,32 @@ export default function ChatInfo1() {
                 flexDirection: 'row',
                 justifyContent: 'flex-end',
                 alignItems: 'center',
-               
               }}>
               <View>
                 <TouchableOpacity
                   onPress={() => {
                     handleChangeGroupName();
                   }}
-                  style={{flexDirection: 'row', margin: 10, alignItems:'center'}}>
+                  style={{
+                    flexDirection: 'row',
+                    margin: 10,
+                    alignItems: 'center',
+                  }}>
                   <AddFriendImg1
                     source={require('../../images/icons8-group-24.png')}></AddFriendImg1>
-                  <Text style={{fontSize:12}}>Update</Text>
+                  <Text style={{fontSize: 12}}>Update</Text>
                 </TouchableOpacity>
               </View>
               <TouchableOpacity
                 onPress={() => setModalVisible(false)}
-                style={{flexDirection: 'row', margin: 10, alignItems:'center'}}>
+                style={{
+                  flexDirection: 'row',
+                  margin: 10,
+                  alignItems: 'center',
+                }}>
                 <CrossImg
                   source={require('../../images/icons8-cross-30.png')}></CrossImg>
-                <Text style={{marginRight: 35, fontSize:12}}>Cancel</Text>
+                <Text style={{marginRight: 35, fontSize: 12}}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>

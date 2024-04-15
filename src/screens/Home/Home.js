@@ -1,19 +1,6 @@
-import React, {useEffect, useId, useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import {View, TouchableOpacity, Text, TextInput, Modal} from 'react-native';
 import {
-  View,
-  FlatList,
-  TouchableOpacity,
-  RefreshControl,
-  AppState,
-  Text,
-  TextInput,
-  Modal,
-  Button,
-  Image,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  AddFriendImg,
   AddFriendImg1,
   CrossImg,
   Header,
@@ -21,35 +8,23 @@ import {
   QrImg,
   SearchImg,
 } from './styles1';
-import Chat from '../Conservation/Chat';
 import {useDispatch, useSelector} from 'react-redux';
-import {
-  // disconnectSocket,
-  // getMessageSocket,
-  // getReceiveNewConverstionsoket,
-  // getUsersOnline,
-  initiateSocket,
-  socket,
-} from '../../utils/socket';
-import {getContacts, handleGetUsersOnline} from '../../redux/userSlice';
+import {initiateSocket, socket} from '../../utils/socket';
+import {handleGetUsersOnline} from '../../redux/userSlice';
 import {
   getAllConversations,
   handleNewConversation,
   selectConversation,
-  selectedConversation,
 } from '../../redux/conversationsSlice';
-import {getUserId, getToken} from '../../utils';
+import {getUserId} from '../../utils';
 import CardChat from '../Conservation/CardChat';
 import {
   handleSetCurrentMessage,
   getCurrentMessage,
 } from '../../redux/messageSlice';
 import {ScrollView} from 'react-native';
-import {ModalPicker} from '../../components/Modal/ModalPicker';
-import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 function Home(props) {
   const [modalVisible, setModalVisible] = useState(false);
-  // const [notiAddMember, setNotiAddMember] = useState('');
   const allConversations = useSelector(
     state => state.conversationReducer.allConversation,
   );
@@ -94,12 +69,21 @@ function Home(props) {
     socket.on('receiveRemoveMessage', res => {
       dispatch(getCurrentMessage(res.conversationId));
     });
+    socket.on('receiveUpdateGroup', res => {
+      getConversations();
+      dispatch(selectConversation(res));
+    });
+    socket.on('receiveNewGroup', res => {
+      dispatch(handleNewConversation(res));
+    });
     getConversations();
     // getAllContacts();
     return () => {
       socket.off('receiveMessage');
       socket.off('usersOnline');
       socket.off('receiveNewConversation');
+      socket.off('receiveUpdateGroup');
+      socket.off('receiveNewGroup');
     };
   }, [socket]);
 
@@ -202,7 +186,15 @@ function Home(props) {
       ) : (
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
           <View style={{marginTop: 200}}>
-            <Text style={{fontSize: 50, color: '#3399ff', fontWeight: 'bold', alignSelf: 'center'}}>Chat App</Text>
+            <Text
+              style={{
+                fontSize: 50,
+                color: '#3399ff',
+                fontWeight: 'bold',
+                alignSelf: 'center',
+              }}>
+              Chat App
+            </Text>
             <Text style={{fontSize: 30, color: '#3399ff'}}>
               Make friends to text
             </Text>

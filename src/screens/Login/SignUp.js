@@ -91,10 +91,10 @@ export function Signup(props) {
   };
 
   const handleSignUp = async () => {
-    if (!verified) {
-      Alert.alert('Please verify code');
-      return;
-    }
+    // if (!verified) {
+    //   Alert.alert('Please verify code');
+    //   return;
+    // }
     if (checkPhoneValid(phone)) {
       if (checkPasswordValid(password)) {
         let data = {

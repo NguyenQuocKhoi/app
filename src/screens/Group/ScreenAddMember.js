@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Text, TouchableOpacity } from 'react-native';
-import { Image, View } from 'react-native-animatable';
+import {  View } from 'react-native-animatable';
 import CardAddMembers from './CardAddMembers';
 import { useSelector } from 'react-redux';
-import { AddFriendImg1, BackImg, HeaderAddMember, LeaveGroupImg } from '../Conservation/styles';
+import {  BackImg, HeaderAddMember, LeaveGroupImg } from '../Conservation/styles';
 import { useNavigation } from '@react-navigation/native';
 
 export default function AddMember(props) {
   const navigation = useNavigation();
   const [members, setMembers] = useState([]);
-  // const [openAddMembers, setOpenAddMembers] = useState(false);
   const selectedConversation = useSelector(
     state => state.conversationReducer.selectedConversation,
   );

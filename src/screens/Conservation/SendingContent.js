@@ -1,11 +1,10 @@
 import moment from 'moment';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   Dimensions,
   Image,
   Linking,
   Modal,
-  SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -13,12 +12,11 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import Video from 'react-native-video';
-import {BASE_URL, getToken, getUserId} from '../../utils';
+import {BASE_URL, getToken, getUser, getUserId} from '../../utils';
 import {useDispatch, useSelector} from 'react-redux';
 import {getCurrentMessage} from '../../redux/messageSlice';
 import {removeMessageSocket, sendMessageSocket} from '../../utils/socket';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
-import {getAllConversations} from '../../redux/conversationsSlice';
 import CardChat1 from './CardConversation';
 export default function SendingContent({data}) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -65,9 +63,15 @@ export default function SendingContent({data}) {
 
   const handleRemoveMessage = async () => {
     const userId = await getUserId();
+    const token = await getToken();
     try {
       const result = await axios.post(
         `${BASE_URL}/conversation/removeMessage/${data._id}`,
+        {
+          headers: {
+            'auth-token': `${token}`,
+          },
+        },
       );
       if (result.status === 200) {
         dispatch(getCurrentMessage(selectedConversation._id));
@@ -86,13 +90,14 @@ export default function SendingContent({data}) {
   const handleForwardMessage = async conversation => {
     const token = await getToken();
     const userId = await getUserId();
+    const user = await getUser();
+    // console.log(user);
     const dt = {
       message: data,
       conversationForwardId: conversation._id,
-      // conversationForwardId: selectedConversation._id,
+      userId: user,
     };
 
-    // console.log(dt);
     try {
       const result = await axios.post(
         `${BASE_URL}/conversation/forwardMessage`,

@@ -2,26 +2,15 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {BASE_URL, getUserId, getToken} from '../../utils';
 import axios from 'axios';
-import {
-  getMessageSocket,
-  sendMessageSocket,
-  newConversationSocket,
-  socket,
-  initiateSocket,
-} from '../../utils/socket';
-import {
-  getCurrentMessage,
-  handleSetCurrentMessage,
-} from '../../redux/messageSlice';
+import {sendMessageSocket, newConversationSocket} from '../../utils/socket';
+import {getCurrentMessage} from '../../redux/messageSlice';
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   PermissionsAndroid,
   Alert,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import SendingContent from './SendingContent';
 import ReceivingContent from './ReceivingContent';
 import {ScrollView} from 'react-native';
@@ -35,26 +24,16 @@ import {
   MicrophoneImg,
   MoreImg,
   PhoneImg,
-  SearchImg,
   SendImg,
   TextNameUser,
   TextOnline,
   VideoCallImg,
 } from './styles';
-import {
-  launchCamera,
-  launchImageLibrary,
-  // ImagePicker,
-} from 'react-native-image-picker';
+import {launchCamera} from 'react-native-image-picker';
 import ImagePicker from 'react-native-image-crop-picker';
-import {Image} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-import {handleGetUsersOnline} from '../../redux/userSlice';
 import Geolocation from '@react-native-community/geolocation';
-import {
-  getAllConversations,
-  handleNewConversation,
-} from '../../redux/conversationsSlice';
+import {getAllConversations} from '../../redux/conversationsSlice';
 export default function Chat() {
   const [inputMessage, setInputMessage] = useState('');
   const scrollRef = useRef(null);
@@ -77,31 +56,7 @@ export default function Chat() {
 
   useEffect(() => {
     getInit();
-    // getConversations();
   }, []);
-
-  // useEffect(() => {
-  //   if (socket === null) return;
-  //   socket.on('receiveMessage', res => {
-  //     dispatch(handleSetCurrentMessage(res));
-  //   });
-  //   socket.on('usersOnline', res => {
-  //     dispatch(handleGetUsersOnline(res));
-  //   });
-  //   socket.on('receiveNewConversation', res => {
-  //     dispatch(handleNewConversation(res));
-  //   });
-  //   socket.on("receiveRemoveMessage", res =>{
-  //     dispatch(getCurrentMessage(res.conversationId));
-  //   })
-  //   getConversations();
-  //   // getAllContacts();
-  //   return () => {
-  //     socket.off('receiveMessage');
-  //     socket.off('usersOnline');
-  //     socket.off('receiveNewConversation');
-  //   };
-  // }, [socket]);
 
   const getInit = async () => {
     const userId = await getUserId();
@@ -189,202 +144,69 @@ export default function Chat() {
   };
 
   //3
-const handlSendImagesLibrary = async () => {
-  try {
-    const userId = await getUserId();
-    const token = await getToken();
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.CAMERA,
-    );
+  const handlSendImagesLibrary = async () => {
+    try {
+      const userId = await getUserId();
+      const token = await getToken();
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+      );
 
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      const images = await ImagePicker.openPicker({
-        multiple: true,
-        mediaType: 'photo',
-        includeBase64: true, // Nếu bạn muốn gửi base64
-      });
-      
-      if (images && images.length > 0) {
-        const formData = new FormData();
-        images.forEach((image, index) => {
-          formData.append('files', {
-            uri: image.path,
-            type: image.mime,
-            name: `image_${index}.jpg`,
-          });
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        const images = await ImagePicker.openPicker({
+          multiple: true,
+          mediaType: 'photo',
+          includeBase64: true, // Nếu bạn muốn gửi base64
         });
-        
-        formData.append('conversationId', selectedConversation._id);
-        formData.append('user', userId);
 
-        try {
-          const result = await axios.post(
-            `${BASE_URL}/conversation/sendImages`,
-            formData,
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-                'auth-token': token,
-              },
-            },
-          );
-
-          if (result.status === 200) {
-            sendMessageSocket({
-              ...result.data,
-              receiverIds: selectedConversation.users
-                .filter(user => user._id !== userId)
-                .map(user => user._id),
+        if (images && images.length > 0) {
+          const formData = new FormData();
+          images.forEach((image, index) => {
+            formData.append('files', {
+              uri: image.path,
+              type: image.mime,
+              name: `image_${index}.jpg`,
             });
+          });
 
-            await dispatch(getCurrentMessage(selectedConversation._id));
+          formData.append('conversationId', selectedConversation._id);
+          formData.append('user', userId);
+
+          try {
+            const result = await axios.post(
+              `${BASE_URL}/conversation/sendImages`,
+              formData,
+              {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                  'auth-token': token,
+                },
+              },
+            );
+
+            if (result.status === 200) {
+              sendMessageSocket({
+                ...result.data,
+                receiverIds: selectedConversation.users
+                  .filter(user => user._id !== userId)
+                  .map(user => user._id),
+              });
+
+              await dispatch(getCurrentMessage(selectedConversation._id));
+            }
+          } catch (error) {
+            console.log(error);
           }
-        } catch (error) {
-          console.log(error);
+        } else {
+          console.log('User cancelled the image picker');
         }
       } else {
-        console.log('User cancelled the image picker');
+        console.log('Camera permission denied');
       }
-    } else {
-      console.log('Camera permission denied');
+    } catch (error) {
+      console.log('Error requesting camera permission:', error);
     }
-  } catch (error) {
-    console.log('Error requesting camera permission:', error);
-  }
-};
-
-
-  //2
-  // const handlSendImagesLibrary = async () => {
-  //   try {
-  //     const userId = await getUserId();
-  //     const token = await getToken();
-  //     const granted = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.CAMERA,
-  //     );
-  
-  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-  //       const result = await launchImageLibrary({
-  //         mediaType: 'photo',
-  //         cameraType: 'back',
-  //         multiple: true, // Cho phép chọn nhiều ảnh
-  //       });
-  //       console.log(result);
-  //       if (!result.cancelled) {
-  //         const formData = new FormData();
-  //         result.assets.forEach((asset, index) => {
-  //           formData.append('files', {
-  //             uri: asset.uri,
-  //             type: 'image/jpeg',
-  //             name: `image_${index}.jpg`, // Tạo tên duy nhất cho mỗi ảnh
-  //           });
-  //         });
-  //         formData.append('conversationId', selectedConversation._id);
-  //         formData.append('user', userId);
-  //         try {
-  //           const result = await axios.post(
-  //             `${BASE_URL}/conversation/sendImages`,
-  //             formData,
-  //             {
-  //               headers: {
-  //                 'Content-Type': 'multipart/form-data',
-  //                 'auth-token': token,
-  //               },
-  //             },
-  //           );
-  
-  //           if (result.status === 200) {
-  //             sendMessageSocket({
-  //               ...result.data,
-  //               receiverIds: selectedConversation.users
-  //                 .filter(user => user._id !== userId)
-  //                 .map(user => user._id),
-  //             });
-  
-  //             await dispatch(getCurrentMessage(selectedConversation._id));
-  //           }
-  //         } catch (error) {
-  //           console.log(error);
-  //         }
-  //       } else {
-  //         console.log('User cancelled the camera');
-  //       }
-  //     } else {
-  //       console.log('Camera permission denied');
-  //     }
-  //   } catch (error) {
-  //     console.log('Error requesting camera permission:', error);
-  //   }
-  // };
-  
-
-  //1
-  // const handlSendImagesLibrary = async () => {
-  //   try {
-  //     const userId = await getUserId();
-  //     const token = await getToken();
-  //     const granted = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.CAMERA,
-  //     );
-
-  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-  //       const result = await launchImageLibrary({
-  //         mediaType: 'photo',
-  //         cameraType: 'back',
-  //         multiple: true,//
-  //       });
-  //       console.log(result);
-  //       if (!result.cancelled) {
-  //         var list = [];
-  //         for (let i = 0; i < result.assets.length; i++) {
-  //           const url = result.assets[i].uri;
-  //           list.push(url);
-  //         }
-  //         const formData = new FormData();
-  //         for (let i = 0; i < result.assets.length; i++) {
-  //           formData.append('files', {
-  //             uri: result.assets[i].uri,
-  //             type: 'image/jpeg',
-  //             name: 'avatar.jpg',
-  //           });
-  //         }
-  //         formData.append('conversationId', selectedConversation._id);
-  //         formData.append('user', userId);
-  //         try {
-  //           const result = await axios.post(
-  //             `${BASE_URL}/conversation/sendImages`,
-  //             formData,
-  //             {
-  //               headers: {
-  //                 'Content-Type': 'multipart/form-data',
-  //                 'auth-token': token,
-  //               },
-  //             },
-  //           );
-
-  //           if (result.status === 200) {
-  //             sendMessageSocket({
-  //               ...result.data,
-  //               receiverIds: selectedConversation.users
-  //                 .filter(user => user._id !== userId)
-  //                 .map(user => user._id),
-  //             });
-
-  //             await dispatch(getCurrentMessage(selectedConversation._id));
-  //           }
-  //         } catch (error) {
-  //           console.log(error);
-  //         }
-  //       } else {
-  //         console.log('User cancelled the camera');
-  //       }
-  //     } else {
-  //       console.log('Camera permission denied');
-  //     }
-  //   } catch (error) {
-  //     console.log('Error requesting camera permission:', error);
-  //   }
-  // };
+  };
 
   const handleLocation = async () => {
     try {
@@ -592,23 +414,6 @@ const handlSendImagesLibrary = async () => {
     }
   }, [currentMessage, selectedConversation]);
 
-  // useEffect(() => {
-  //   getId();
-  // }, []);
-  // const getId = async () => {
-  //   try {
-  //     const value = await AsyncStorage.getItem('user');
-  //     if (value !== null) {
-  //       const user = JSON.parse(value);
-  //       // console.log('token: ',user.user._id);
-  //       setId(user.user._id);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     throw error;
-  //   }
-  // };
-
   return (
     <View style={{flex: 1, backgroundColor: '#F2FFFF'}}>
       <Header>
@@ -618,7 +423,7 @@ const handlSendImagesLibrary = async () => {
         </TouchableOpacity>
         <View>
           <TextNameUser>
-            {selectedConversation.isGroup
+            {selectedConversation?.isGroup
               ? selectedConversation.name
               : recipient?.name}
           </TextNameUser>
@@ -711,7 +516,7 @@ const handlSendImagesLibrary = async () => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              handlSendImages();//chụp được gửi không được
+              handlSendImages(); //chụp được gửi không được
             }}>
             <MicrophoneImg
               source={require('../../images/icons8-camera-30.png')}></MicrophoneImg>

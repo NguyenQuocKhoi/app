@@ -1,26 +1,21 @@
 import {useEffect, useState} from 'react';
 import {Alert, Text, TouchableOpacity} from 'react-native';
 import {Image, View} from 'react-native-animatable';
-import CardAddMembers from './CardAddMembers';
 import {useSelector} from 'react-redux';
-import {
-  AddFriendImg1,
-  BackImg,
-  HeaderAddMember,
-  LeaveGroupImg,
-} from '../Conservation/styles';
+import {BackImg, HeaderAddMember, LeaveGroupImg} from '../Conservation/styles';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import {useDispatch} from 'react-redux';
-import {BASE_URL, getUser, getUserId} from '../../utils';
+import {BASE_URL, getToken, getUserId} from '../../utils';
 import {
   getAllConversations,
   selectConversation,
 } from '../../redux/conversationsSlice';
+import {updateGroup} from '../../utils/socket';
 export default function Members(props) {
   const navigation = useNavigation();
   const [members, setMembers] = useState([]);
-  const [openAddMembers, setOpenAddMembers] = useState(false);
+
   const selectedConversation = useSelector(
     state => state.conversationReducer.selectedConversation,
   );
@@ -30,40 +25,72 @@ export default function Members(props) {
     if (selectedConversation.isGroup) {
       setMembers(selectedConversation.users);
     }
-    // setUserId(userId);
     getUserId1();
   }, [selectedConversation]);
 
   const getUserId1 = async () => {
     const userId = await getUserId();
-    // if (userId) {
     setUserId(userId);
-    // }
   };
 
   const handleDeleteConversation = async () => {
     const userId = await getUserId();
-
+    const token = await getToken();
     try {
       const result = await axios.delete(
         `${BASE_URL}/conversation/deleteConversation/${selectedConversation._id}`,
+        {
+          headers: {
+            'auth-token': `${token}`,
+          },
+        },
       );
-      Alert.alert('Success');
-      navigation.navigate('HomeScreenNav');
-      await dispatch(getAllConversations(userId));
-      await dispatch(selectConversation(null));
-      // if (result.status === 200) {
-      //   await dispatch(getAllConversations(userId));
-      //   await dispatch(selectConversation(null));
-
-      //   Alert.alert('Success');
-      //   navigation.navigate('Home')
-      // }
+      if (result.status == 200) {
+        Alert.alert('Success');
+        navigation.navigate('HomeScreenNav');
+        await dispatch(getAllConversations(userId));
+        await dispatch(selectConversation(null));
+        updateGroup(
+          result.data,
+          selectedConversation.users
+            .filter(user => user._id !== userId)
+            .map(user => user._id),
+        );
+      }
     } catch (error) {
       console.log(error);
     }
   };
-  // console.log(userId);
+
+  const handleOutGroup = async () => {
+    try {
+      const userId = await getUserId();
+      const token = await getToken();
+      const dt = {
+        conversationId: selectedConversation._id,
+        userId: userId,
+      };
+      const result = await axios.post(`${BASE_URL}/conversation/outGroup`, dt, {
+        headers: {
+          'auth-token': `${token}`,
+        },
+      });
+      if (result.status == 200) {
+        Alert.alert('Success');
+        navigation.navigate('HomeScreenNav');
+        await dispatch(getAllConversations(userId));
+        await dispatch(selectConversation(null));
+        updateGroup(
+          result.data,
+          selectedConversation.users
+            .filter(user => user._id !== userId)
+            .map(user => user._id),
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <View>
       <HeaderAddMember>
@@ -104,7 +131,11 @@ export default function Members(props) {
 
       {selectedConversation.isGroup && selectedConversation.admin !== userId ? (
         <View>
-          <TouchableOpacity style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+            style={{flexDirection: 'row'}}
+            onPress={() => {
+              handleOutGroup();
+            }}>
             <LeaveGroupImg
               source={require('../../images/icons8-export-24.png')}></LeaveGroupImg>
             <Text style={{color: 'red', fontSize: 20}}>Leave group</Text>

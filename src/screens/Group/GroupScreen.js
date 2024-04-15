@@ -4,9 +4,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Checkbox,
   FlatList,
-  Alert,
 } from 'react-native';
 import {
   ArrowRightImg,
@@ -14,38 +12,28 @@ import {
   CameraImg,
   CrossImg,
   Header,
-  PlusImg,
-  QrImg,
   SearchImg,
-  TickImg,
 } from './styles';
-import { useNavigation } from '@react-navigation/native';
-import { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { BASE_URL, getToken, getUser, getUserId } from '../../utils';
+import {useNavigation} from '@react-navigation/native';
+import {useEffect,  useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {BASE_URL, getToken, getUserId} from '../../utils';
 import axios from 'axios';
 import {
   getAllConversations,
   selectConversation,
 } from '../../redux/conversationsSlice';
-import { getContacts } from '../../redux/userSlice';
-import { RadioButton } from 'react-native-paper';
+import {getContacts} from '../../redux/userSlice';
+import {RadioButton} from 'react-native-paper';
+import {newGroup} from '../../utils/socket';
 
 export default function GroupScreen() {
   const navigation = useNavigation();
-  const inputFileReference = useRef(null);
   const dispatch = useDispatch();
   const contacts = useSelector(state => state.userReducer.contacts);
-  const [urlImage, setUrlImage] = useState('');
   const [inputNameGroup, setInputNameGroup] = useState('');
   const [selectContacts, setSelectContacts] = useState([]);
   const [isClick, setIsClick] = useState(false);
-
-  const uploadImage = async () => {
-    const selectedFile = inputFileReference.current.files[0];
-    const url = URL.createObjectURL(selectedFile);
-    await setUrlImage(url);
-  };
 
   const handleSelectContacts = item => {
     if (selectContacts.includes(item)) {
@@ -63,19 +51,29 @@ export default function GroupScreen() {
       groupName: inputNameGroup,
       userIds: selectContacts,
     };
-    const result = await axios.post(
-      `${BASE_URL}/conversation/createGroup`,
-      dt,
-      {
-        headers: {
-          'auth-token': `${token}`,
+    try {
+      const result = await axios.post(
+        `${BASE_URL}/conversation/createGroup`,
+        dt,
+        {
+          headers: {
+            'auth-token': `${token}`,
+          },
         },
-      },
-    );
-    if (result.status === 200) {
-      await dispatch(getAllConversations(userId));
-      await dispatch(selectConversation(result.data._id));
-      navigation.goBack();
+      );
+      if (result.status === 200) {
+        await dispatch(getAllConversations(userId));
+        await dispatch(selectConversation(result.data._id));
+        newGroup(
+          result.data,
+          result.data.users
+            .filter(user => user._id !== userId)
+            .map(user => user._id),
+        );
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -100,12 +98,12 @@ export default function GroupScreen() {
             source={require('../../images/icons8-back-50.png')}></BackImg>
         </TouchableOpacity>
         <View>
-          <Text style={{ fontSize: 20, color: 'white', marginLeft: 10 }}>
+          <Text style={{fontSize: 20, color: 'white', marginLeft: 10}}>
             Nhóm mới
           </Text>
         </View>
       </Header>
-      <View style={{ height: 50, flexDirection: 'row', alignItems: 'center' }}>
+      <View style={{height: 50, flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity>
           <CameraImg
             source={require('../../images/icons8-camera-24.png')}></CameraImg>
@@ -122,7 +120,7 @@ export default function GroupScreen() {
           value={inputNameGroup}
           onChangeText={setInputNameGroup}></TextInput>
       </View>
-      <View style={{ height: 70, justifyContent: 'center' }}>
+      <View style={{height: 70, justifyContent: 'center'}}>
         <View
           style={{
             backgroundColor: '#E0E0E0',
@@ -138,15 +136,15 @@ export default function GroupScreen() {
               source={require('../../images/icons8-search-50.png')}></SearchImg>
           </TouchableOpacity>
           <TextInput
-            style={{ width: 250, height: 45, fontSize: 20, marginLeft: 10 }}
+            style={{width: 250, height: 45, fontSize: 20, marginLeft: 10}}
             placeholder="Tìm số điện thoại"></TextInput>
         </View>
       </View>
 
-      <View style={{ height: 520 }}>
+      <View style={{height: 520}}>
         <FlatList
           data={contacts}
-          renderItem={({ item }) => {
+          renderItem={({item}) => {
             return (
               <View>
                 <TouchableOpacity
@@ -190,7 +188,7 @@ export default function GroupScreen() {
                         {item.name}
                       </Text>
                     </View>
-                    <View style={{ width: 50 }}>
+                    <View style={{width: 50}}>
                       <RadioButton
                         value={`checkbox-${item._id}`}
                         status={
@@ -217,9 +215,25 @@ export default function GroupScreen() {
             );
           }}></FlatList>
 
-        <View style={{ flexDirection: 'row', borderWidth: 1, borderColor: 'gray', height: 60, alignItems: 'center' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            borderWidth: 1,
+            borderColor: 'gray',
+            height: 60,
+            alignItems: 'center',
+          }}>
           {selectContacts?.map((item, index) => (
-            <View style={{ backgroundColor: '#3399ff', height: 50, width: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center', marginLeft: 10 }}>
+            <View
+              style={{
+                backgroundColor: '#DCDCDC',
+                height: 50,
+                width: 50,
+                borderRadius: 25,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginLeft: 10,
+              }}>
               {/* <Image
                 style={{
                   height: 40,
@@ -234,17 +248,32 @@ export default function GroupScreen() {
                 }
               /> */}
               {/* <Text>{item.name}</Text> */}
-              <Text style={{ color: 'white', fontSize: 20, marginTop: -20 }}>
-                {item.name.charAt(0).toUpperCase()}
-                {item.name.charAt(6).toUpperCase()}
-              </Text>
+              <View style={{color: 'white', fontSize: 20, marginTop: -20, alignItems:'center', justifyContent:'center'}}>
+                <Image
+                  style={{
+                    height: 40,
+                    width: 40,
+                    borderRadius: 50,
+                  }}
+                  src={
+                    item.avatar
+                      ? item.avatar
+                      : 'https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png'
+                  }></Image>
+              </View>
               <TouchableOpacity
                 // style chạy trên máy thật
-                style={{ height: 25, width: 25, borderRadius: 20, backgroundColor: 'gray', marginLeft: 40, marginTop: -40 }}
+                style={{
+                  height: 25,
+                  width: 25,
+                  borderRadius: 20,
+                  backgroundColor: 'gray',
+                  marginLeft: 40,
+                  marginTop: -40,
+                }}
                 onPress={() => {
                   const update = selectContacts.filter(i => i !== item);
                   setSelectContacts(update);
-
                 }}>
                 {/* style này chạy trên máy ảo */}
                 {/* <View style={{ height: 25, width: 25, borderRadius: 20, backgroundColor: 'gray', marginLeft: 40, marginTop: -50 }}> */}
@@ -260,8 +289,14 @@ export default function GroupScreen() {
           <TouchableOpacity
             disabled={!inputNameGroup && selectContacts.length < 2}
             onPress={() => handleNewGroup()}
-            style={{ backgroundColor: '#3399ff', borderRadius: 25, height: 50, width: 50, justifyContent: 'center', marginLeft: 10 }}
-          >
+            style={{
+              backgroundColor: '#3399ff',
+              borderRadius: 25,
+              height: 50,
+              width: 50,
+              justifyContent: 'center',
+              marginLeft: 10,
+            }}>
             {/* <Text style={{color: 'white', textAlign: 'center'}}>Tạo</Text> */}
             <ArrowRightImg
               source={require('../../images/icons8-arrow-right-50.png')}></ArrowRightImg>

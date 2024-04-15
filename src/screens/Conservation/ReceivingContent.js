@@ -1,15 +1,22 @@
 import moment from 'moment';
 import {useEffect, useState} from 'react';
-import {Dimensions, Image, Linking, Modal, ScrollView, TouchableOpacity, View} from 'react-native';
+import {
+  Dimensions,
+  Image,
+  Linking,
+  Modal,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {Text} from 'react-native-animatable';
 import Video from 'react-native-video';
 import axios from 'axios';
 import {useDispatch, useSelector} from 'react-redux';
-import {BASE_URL, getToken, getUserId} from '../../utils';
-import {getCurrentMessage} from '../../redux/messageSlice';
-import {removeMessageSocket, sendMessageSocket} from '../../utils/socket';
+import {BASE_URL, getToken, getUser, getUserId} from '../../utils';
+
+import {sendMessageSocket} from '../../utils/socket';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
-import {getAllConversations} from '../../redux/conversationsSlice';
 import CardChat1 from './CardConversation';
 export default function ReceivingContent({data, sender}) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -56,13 +63,12 @@ export default function ReceivingContent({data, sender}) {
   const handleForwardMessage = async conversation => {
     const token = await getToken();
     const userId = await getUserId();
+    const user = await getUser();
     const dt = {
       message: data,
       conversationForwardId: conversation._id,
-      // conversationForwardId: selectedConversation._id,
+      userId: user,
     };
-
-    // console.log(dt);
     try {
       const result = await axios.post(
         `${BASE_URL}/conversation/forwardMessage`,
@@ -97,7 +103,7 @@ export default function ReceivingContent({data, sender}) {
           style={{flex: 1, backgroundColor: '#C0C0C0'}}
           onPress={() => setModalVisible(false)}>
           <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity
+            <TouchableOpacity
               style={{position: 'absolute', top: 20, right: 20, zIndex: 999}}
               onPress={() => {
                 setModalVisible(false);
@@ -289,14 +295,14 @@ export default function ReceivingContent({data, sender}) {
           </View>
         ) : null}
         {data.video ? (
-        <TouchableOpacity onPress={() => showVideo(data.video)}>
-          <Video
-            source={{uri: data.video}}
-            style={{width: 200, height: 200}}
-            // controls={true}
-          />
-        </TouchableOpacity>
-      ) : null}
+          <TouchableOpacity onPress={() => showVideo(data.video)}>
+            <Video
+              source={{uri: data.video}}
+              style={{width: 200, height: 200}}
+              // controls={true}
+            />
+          </TouchableOpacity>
+        ) : null}
         {data.location ? (
           <View>
             <MapView
@@ -321,10 +327,10 @@ export default function ReceivingContent({data, sender}) {
           {moment(data.createdAt).format('HH:mm')}
         </Text>
         <View>
-        <TouchableOpacity onPress={() => showModalContent(data)}>
-          <Text style={{color: 'blue', alignSelf: 'center'}}>Share</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity onPress={() => showModalContent(data)}>
+            <Text style={{color: 'blue', alignSelf: 'center'}}>Share</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
