@@ -99,7 +99,7 @@ export default function GroupScreen() {
         </TouchableOpacity>
         <View>
           <Text style={{fontSize: 20, color: 'white', marginLeft: 10}}>
-            Nhóm mới
+            New group
           </Text>
         </View>
       </Header>
@@ -116,11 +116,11 @@ export default function GroupScreen() {
             marginLeft: 10,
             marginTop: 10,
           }}
-          placeholder="  Đặt tên nhóm"
+          placeholder="  Name Group"
           value={inputNameGroup}
           onChangeText={setInputNameGroup}></TextInput>
       </View>
-      <View style={{height: 70, justifyContent: 'center'}}>
+      {/* <View style={{height: 70, justifyContent: 'center'}}>
         <View
           style={{
             backgroundColor: '#E0E0E0',
@@ -139,7 +139,7 @@ export default function GroupScreen() {
             style={{width: 250, height: 45, fontSize: 20, marginLeft: 10}}
             placeholder="Tìm số điện thoại"></TextInput>
         </View>
-      </View>
+      </View> */}
 
       <View style={{height: 520}}>
         <FlatList

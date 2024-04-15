@@ -42,7 +42,7 @@ export default function CardAddMembers(props) {
       setSelectContacts([...selectContacts, item]);
     }
   };
-
+  // console.log(props.conversation);
   const handleAddMembers = async () => {
     const token = await getToken();
     const userId = await getUserId();
@@ -63,20 +63,23 @@ export default function CardAddMembers(props) {
       );
       if (result.status === 200) {
         await dispatch(selectConversation(result.data));
+        Alert.alert('Success');
       }
-      newGroup(
-        result.data,
-        selectContacts.map(user => user._id),
-      );
+        newGroup(
+          result.data,
+          selectContacts.map(user => user._id),
+        );
 
-      updateGroup(
-        result.data,
-        props.conversation.users
-          .filter(user => user._id !== userId)
-          .map(user => user._id),
-      );
+        updateGroup(
+          result.data,
+          props.conversation.users
+            .filter(user => user._id !== userId)
+            .map(user => user._id),
+        );
+      
       Alert.alert('Success');
     } catch (error) {
+      console.log(1);
       console.log(error);
     }
   };
