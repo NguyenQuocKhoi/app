@@ -153,11 +153,11 @@ export default function ChatInfo1() {
         </TouchableOpacity>
         <View>
           <Text style={{fontSize: 20, color: 'white', marginLeft: 10}}>
-            Tùy chọn
+            Option
           </Text>
         </View>
       </HeaderAddMember>
-      <View style={{alignItems: 'center'}}>
+      <View style={{alignItems: 'center', marginBottom: 10}}>
         <View
           style={{
             height: 80,
@@ -183,7 +183,7 @@ export default function ChatInfo1() {
             }
           />
           <TouchableOpacity
-            // onPress={()=>requestCameraPermission()}
+            style={{height: 40, width: 40, position: 'absolute'}}
             onPress={() => handleChangeGroupImage()}>
             <IconCamera
               source={require('../../images/icons8-camera-30.png')}></IconCamera>
@@ -345,7 +345,7 @@ export default function ChatInfo1() {
                     navigation.navigate('Members');
                   }}>
                   <Text style={{fontSize: 20, color: 'black', marginLeft: 10}}>
-                    Xem thành viên
+                    List members
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -364,7 +364,7 @@ export default function ChatInfo1() {
                     }}></Image>
 
                   <Text style={{fontSize: 20, color: 'black', marginLeft: 10}}>
-                    Thêm thành viên
+                    Add member
                   </Text>
                 </View>
               </TouchableOpacity>

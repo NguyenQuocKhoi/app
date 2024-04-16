@@ -23,6 +23,23 @@ export default function CardAddMembers(props) {
   );
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (contacts && props.members) {
+          const filteredContacts = contacts.filter(
+            item => !props.members.find(item2 => item._id === item2._id)
+          );
+          setListRender(filteredContacts);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+  
+    fetchData();
+  }, [contacts, props.members]);
+
+  useEffect(() => {
     getAllContacts();
   }, []);
   const getAllContacts = async () => {
@@ -83,21 +100,6 @@ export default function CardAddMembers(props) {
       console.log(error);
     }
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const filteredContacts = contacts?.filter(
-          item => !props.members.find(item2 => item._id === item2._id),
-        );
-        setListRender(filteredContacts);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   return (
     <View {...props}>

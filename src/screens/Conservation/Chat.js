@@ -516,7 +516,7 @@ export default function Chat() {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              handlSendImages(); //chụp được gửi không được
+              handlSendImages();
             }}>
             <MicrophoneImg
               source={require('../../images/icons8-camera-30.png')}></MicrophoneImg>

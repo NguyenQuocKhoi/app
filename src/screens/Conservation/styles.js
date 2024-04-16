@@ -124,7 +124,6 @@ export const TextOnline = styled.Text`
 export const IconCamera = styled.Image`
   height: 30px;
   width: 30px;
-  margin-top: -20px;
-  margin-left: 15px;
-  position: absolute;
+  margin-top: 30px;
+  margin-left: 30px;
 `;
