@@ -146,6 +146,7 @@ export default function Members(props) {
         },
       );
       if (result.status === 200) {
+        await dispatch(selectConversation(result.data))
         Alert.alert('Success');
         updateGroup(
           result.data,
@@ -153,7 +154,7 @@ export default function Members(props) {
             .filter(user => user._Id !== userId)
             .map(user => user._id),
         );
-        navigation.goBack();
+        navigation.goBack();//
       }
     } catch (error) {
       console.log(error);
@@ -168,7 +169,7 @@ export default function Members(props) {
         </TouchableOpacity>
         <View>
           <Text style={{fontSize: 20, color: 'white', marginLeft: 10}}>
-            Tùy chọn
+            Option
           </Text>
         </View>
       </HeaderAddMember>
