@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 
-BASE_URL = 'http://192.168.1.6:3300';
+BASE_URL = 'http://192.168.1.8:3300';
 let socket;
 
 const initiateSocket = userId => {
@@ -35,9 +35,9 @@ const disconnectSocket = () => {
   }
 };
 
-const updateGroup = (conversation, receiverId) => {
+const updateGroup = (conversation, receiverId, message) => {
   if (socket) {
-    socket.emit('updateGroup', conversation, receiverId);
+    socket.emit('updateGroup', conversation, receiverId, message);
   }
 };
 

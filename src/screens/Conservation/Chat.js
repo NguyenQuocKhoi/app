@@ -33,9 +33,14 @@ import {launchCamera} from 'react-native-image-picker';
 import ImagePicker from 'react-native-image-crop-picker';
 import DocumentPicker from 'react-native-document-picker';
 import Geolocation from '@react-native-community/geolocation';
-import {getAllConversations} from '../../redux/conversationsSlice';
+import {
+  getAllConversations,
+  setNotification,
+} from '../../redux/conversationsSlice';
+import {Text} from 'react-native-animatable';
 export default function Chat() {
   const [inputMessage, setInputMessage] = useState('');
+  const [notiAddMember, setNotiAddMember] = useState('');
   const scrollRef = useRef(null);
   const [userId, setId] = useState('');
   const dispatch = useDispatch();
@@ -49,6 +54,9 @@ export default function Chat() {
   );
   const currentMessage = useSelector(
     state => state.messageReducer.currentMessage,
+  );
+  const notification = useSelector(
+    state => state.conversationReducer.notification,
   );
   const isOnline = Object.keys(usersOnline).find(id => id === recipient?._id);
   const [img, setImg] = useState([]);
@@ -471,6 +479,19 @@ export default function Chat() {
             }
           })}
         </ScrollView>
+        <View>
+          {selectedConversation?.isGroup && notification ? (
+            <View>
+              <Text>Notification: {notification}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  dispatch(setNotification(null));
+                }}>
+                <Text style={{fontSize:20, color:'red'}}>X</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
+        </View>
 
         <View
           style={{

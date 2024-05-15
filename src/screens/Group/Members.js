@@ -6,10 +6,11 @@ import {BackImg, HeaderAddMember, LeaveGroupImg} from '../Conservation/styles';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import {useDispatch} from 'react-redux';
-import {BASE_URL, getToken, getUserId} from '../../utils';
+import {BASE_URL, getToken, getUser, getUserId} from '../../utils';
 import {
   getAllConversations,
   selectConversation,
+  setNotification,
 } from '../../redux/conversationsSlice';
 import {updateGroup} from '../../utils/socket';
 export default function Members(props) {
@@ -66,6 +67,7 @@ export default function Members(props) {
 
   const handleOutGroup = async () => {
     try {
+      const user = await getUser();
       const userId = await getUserId();
       const token = await getToken();
       const dt = {
@@ -87,6 +89,7 @@ export default function Members(props) {
           selectedConversation.users
             .filter(user => user._id !== userId)
             .map(user => user._id),
+            `${user.name} out group`
         );
       }
     } catch (error) {
@@ -94,7 +97,7 @@ export default function Members(props) {
     }
   };
 
-  const handleChangeAdmin = async value => {
+  const handleChangeAdmin = async (value,name) => {
     try {
       const token = await getToken();
       const userId = await getUserId();
@@ -120,14 +123,16 @@ export default function Members(props) {
           selectedConversation.users
             .filter(user => user._id !== userId)
             .map(user => user._id),
+            `Admin change to ${name}`
         );
+        dispatch(setNotification(`Admin change to ${name}`))
       }
     } catch (error) {
       console.log(error);
     }
   };
   // console.log(selectedConversation.users);
-  const handleReomveMember = async value => {
+  const handleReomveMember = async (value,name) => {
     try {
       const userId = await getUserId();
       const token = await getToken();
@@ -153,7 +158,9 @@ export default function Members(props) {
           selectedConversation.users
             .filter(user => user._Id !== userId)
             .map(user => user._id),
+            `Remove member ${name}`
         );
+        dispatch(setNotification(`Remove member ${name}`))
         navigation.goBack();//
       }
     } catch (error) {
@@ -224,7 +231,7 @@ export default function Members(props) {
                     <View style={{marginTop: -15}}>
                       <TouchableOpacity
                         onPress={() => {
-                          handleReomveMember(item._id);
+                          handleReomveMember(item._id, item.name);
                         }}>
                         <Text
                           style={{
@@ -239,7 +246,7 @@ export default function Members(props) {
 
                       <TouchableOpacity
                         onPress={() => {
-                          handleChangeAdmin(item._id);
+                          handleChangeAdmin(item._id, item.name);
                         }}>
                         <Text
                           style={{

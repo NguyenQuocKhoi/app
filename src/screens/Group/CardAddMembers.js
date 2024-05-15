@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import {BASE_URL, getToken, getUserId} from '../../utils';
-import {selectConversation} from '../../redux/conversationsSlice';
+import {selectConversation, setNotification} from '../../redux/conversationsSlice';
 import {getContacts} from '../../redux/userSlice';
 import {AddFriendImg1} from './styles';
 import {RadioButton} from 'react-native-paper';
@@ -92,8 +92,9 @@ export default function CardAddMembers(props) {
           props.conversation.users
             .filter(user => user._id !== userId)
             .map(user => user._id),
+            `${selectContacts.map(user=>user.name)} join group`
         );
-      
+      dispatch(setNotification(`${selectContacts.map(user=>user.name)} join group`))
       Alert.alert('Success');
     } catch (error) {
       console.log(1);

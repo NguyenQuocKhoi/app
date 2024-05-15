@@ -15,6 +15,7 @@ import {
   getAllConversations,
   handleNewConversation,
   selectConversation,
+  setNotification,
 } from '../../redux/conversationsSlice';
 import {getUserId} from '../../utils';
 import CardChat from '../Conservation/CardChat';
@@ -49,7 +50,6 @@ function Home(props) {
     const userId = await getUserId();
     if (userId) {
       initiateSocket(userId);
-      // console.log(1);
     }
   };
 
@@ -71,10 +71,12 @@ function Home(props) {
     });
     socket.on('receiveUpdateGroup', res => {
       getConversations();
-      dispatch(selectConversation(res));
+      dispatch(selectConversation(res.conversation));
+      dispatch(setNotification(res.message))
     });
     socket.on('receiveNewGroup', res => {
       dispatch(handleNewConversation(res));
+      
     });
     getConversations();
     // getAllContacts();

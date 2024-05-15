@@ -61,6 +61,7 @@ const conversationsSlice = createSlice({
     allConversation: [],
     selectedConversation: null,
     userRecipient: null,
+    notification: null
   },
   reducers: {
     selectConversation: (state, action) => {
@@ -69,6 +70,9 @@ const conversationsSlice = createSlice({
     handleNewConversation: (state, action) => {
       state.allConversation = [...state.allConversation, action.payload];
     },
+    setNotification:(state, action)=>{
+      state.notification = action.payload
+    }
   },
   extraReducers: builder => {
     builder
@@ -84,5 +88,5 @@ const conversationsSlice = createSlice({
   },
 });
 const {reducer, actions} = conversationsSlice;
-export const {selectConversation, handleNewConversation} = actions;
+export const {selectConversation, handleNewConversation, setNotification} = actions;
 export default reducer;

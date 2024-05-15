@@ -18,11 +18,12 @@ import {
   IconCamera,
 } from './styles';
 import {useNavigation} from '@react-navigation/native';
-import {BASE_URL, getToken, getUserId} from '../../utils';
+import {BASE_URL, getToken, getUser, getUserId} from '../../utils';
 import axios from 'axios';
 import {
   getAllConversations,
   selectConversation,
+  setNotification,
 } from '../../redux/conversationsSlice';
 import {updateGroup} from '../../utils/socket';
 import {launchCamera} from 'react-native-image-picker';
@@ -50,6 +51,7 @@ export default function ChatInfo1() {
   const dispatch = useDispatch();
 
   const handleChangeGroupName = async () => {
+    const user = await getUser();
     try {
       const dt = {
         conversationId: selectedConversation._id,
@@ -76,8 +78,14 @@ export default function ChatInfo1() {
             .filter(user => user._id !== userId)
             .map(user => user._id),
         );
-        Alert.alert('Success');
+        `${user.name} change name group to '${inputNameGroup}'`;
       }
+      dispatch(
+        setNotification(
+          `${user.name} change name group to '${inputNameGroup}'`,
+        ),
+      );
+      Alert.alert('Success');
     } catch (error) {
       console.log(error);
       Alert.alert('Fail');
@@ -88,6 +96,7 @@ export default function ChatInfo1() {
     try {
       const userId = await getUserId();
       const token = await getToken();
+      const user = await getUser();
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.CAMERA,
       );
@@ -128,7 +137,10 @@ export default function ChatInfo1() {
                 result.data.users
                   .filter(user => user._id !== userId)
                   .map(user => user._id),
+                `${user.name} change avatar of group`,
               );
+              dispatch(setNotification(`${user.name} change avatar of group`));
+              Alert.alert('Success');
             }
           } catch (error) {
             console.log(error);
@@ -178,7 +190,8 @@ export default function ChatInfo1() {
             }}
             src={
               selectedConversation.isGroup
-                ? selectedConversation.image || 'https://static.vecteezy.com/system/resources/previews/010/154/511/non_2x/people-icon-sign-symbol-design-free-png.png'
+                ? selectedConversation.image ||
+                  'https://static.vecteezy.com/system/resources/previews/010/154/511/non_2x/people-icon-sign-symbol-design-free-png.png'
                 : 'https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png'
             }
           />
