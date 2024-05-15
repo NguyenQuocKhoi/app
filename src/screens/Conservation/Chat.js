@@ -481,13 +481,13 @@ export default function Chat() {
         </ScrollView>
         <View>
           {selectedConversation?.isGroup && notification ? (
-            <View>
-              <Text>Notification: {notification}</Text>
+            <View style={{flexDirection: 'row', borderWidth: 1, backgroundColor: '#E0E0E0', borderRadius: 10, justifyContent: 'space-around', alignItems: 'center', width: 380, alignSelf: 'center', height: 35}}>
+              <Text style={{color: 'black'}}> Notification: {notification}</Text>
               <TouchableOpacity
                 onPress={() => {
                   dispatch(setNotification(null));
                 }}>
-                <Text style={{fontSize:20, color:'red'}}>X</Text>
+                <Text style={{fontSize: 25, color:'red'}}>X</Text>
               </TouchableOpacity>
             </View>
           ) : null}
