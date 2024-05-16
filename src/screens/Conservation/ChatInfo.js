@@ -50,6 +50,7 @@ export default function ChatInfo1() {
   const [inputNameGroup, setInputNameGroup] = useState(groupName);
   const dispatch = useDispatch();
 
+  console.log(selectedConversation._id);
   const handleChangeGroupName = async () => {
     const user = await getUser();
     try {
@@ -77,15 +78,17 @@ export default function ChatInfo1() {
           result.data.users
             .filter(user => user._id !== userId)
             .map(user => user._id),
-        );
-        `${user.name} change name group to '${inputNameGroup}'`;
-      }
-      dispatch(
-        setNotification(
+
           `${user.name} change name group to '${inputNameGroup}'`,
-        ),
-      );
-      Alert.alert('Success');
+        );
+        dispatch(
+          setNotification(
+            `${user.name} change name group to '${inputNameGroup}'`,
+          ),
+        );
+
+        Alert.alert('Success');
+      }
     } catch (error) {
       console.log(error);
       Alert.alert('Fail');
